@@ -39,7 +39,7 @@ smaller: true
 
 - Applications in Macroeconomics
 
-- Excercises
+- Exercises
 
 # Vector Autoregression{background-color="#0056B9"}
 
@@ -125,7 +125,7 @@ smaller: true
 - $MN$ is the matrix normal distribution
 
   $$
-  	A\sim MN(M,U,V)\Leftrightarrow vec(A)\sim N(vec(M),V\otimes U)
+  	A\sim MN(M,U,V)\Leftrightarrow \text{vec}(A)\sim N(\text{vec}(M),V\otimes U)
   $$
 
 - $IW$ is the inverse Wishart distribution
@@ -358,7 +358,7 @@ plot(forecast, data_in_plot = .2)
     $$
 
 - Can impose restrictions on IRFs at further horizons
-  - e.g. $A_1B^{-1}u_t$ at horizon 1
+  - e.g. $A_1B^{-1}$ at horizon 1, etc.
     $$
     	\begin{align*}
     		y_{t+1} & = A_1 y_{t} + \dots        \\
@@ -558,34 +558,35 @@ head(data[, 1:5])
 - Restricting $B$ is not enough, let's consider the IRFs
 
 - What happends to the variables when there is a positive monetary policy shock?
+
   - CASH: increases, by definition
   - GDP: unrestricted, since we are interested in its response
   - CPI: decreases, expect negative inflation
   - TWI: increases, encourage investing in AUD
 
-$$
-	\begin{align*}
-		\begin{bmatrix}
-			\text{CASH}_t \\
-			\text{GDP}_t  \\
-			\text{CPI}_t  \\
-			\text{TWI}_t  \\
-		\end{bmatrix}
-		=\dots+
-		\begin{bmatrix}
-			+    & \ast & \ast & \ast \\
-			\ast & \ast & \ast & \ast \\
-			-    & \ast & \ast & \ast \\
-			+    & \ast & \ast & \ast \\
-		\end{bmatrix}
-		\begin{bmatrix}
-			u_{t}^{MP} \\
-			u_{2,t}    \\
-			u_{3,t}    \\
-			u_{4,t}    \\
-		\end{bmatrix}
-	\end{align*}
-$$
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			\text{CASH}_t \\
+  			\text{GDP}_t  \\
+  			\text{CPI}_t  \\
+  			\text{TWI}_t  \\
+  		\end{bmatrix}
+  		=\dots+
+  		\begin{bmatrix}
+  			+    & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast \\
+  			-    & \ast & \ast & \ast \\
+  			+    & \ast & \ast & \ast \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			u_{t}^{MP} \\
+  			u_{2,t}    \\
+  			u_{3,t}    \\
+  			u_{4,t}    \\
+  		\end{bmatrix}
+  \end{align*}
+  $$
 
 - Can extend these restrictions to horizons $1,2,3$
 

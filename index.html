@@ -222,7 +222,7 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <li class="fragment"><p>Vector Autoregression (VAR)</p></li>
 <li class="fragment"><p>Structural Vector Autoregression (SVAR)</p></li>
 <li class="fragment"><p>Applications in Macroeconomics</p></li>
-<li class="fragment"><p>Excercises</p></li>
+<li class="fragment"><p>Exercises</p></li>
 </ul>
 </section>
 
@@ -307,7 +307,7 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 \]</span></p></li>
 <li class="fragment"><p><span class="math inline">\(MN\)</span> is the matrix normal distribution</p>
 <p><span class="math display">\[
-  A\sim MN(M,U,V)\Leftrightarrow vec(A)\sim N(vec(M),V\otimes U)
+  A\sim MN(M,U,V)\Leftrightarrow \text{vec}(A)\sim N(\text{vec}(M),V\otimes U)
 \]</span></p></li>
 <li class="fragment"><p><span class="math inline">\(IW\)</span> is the inverse Wishart distribution</p>
 <ul>
@@ -541,7 +541,7 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 </ul></li>
 <li class="fragment"><p>Can impose restrictions on IRFs at further horizons</p>
 <ul>
-<li class="fragment">e.g.&nbsp;<span class="math inline">\(A_1B^{-1}u_t\)</span> at horizon 1 <span class="math display">\[
+<li class="fragment">e.g.&nbsp;<span class="math inline">\(A_1B^{-1}\)</span> at horizon 1, etc. <span class="math display">\[
     \begin{align*}
         y_{t+1} &amp; = A_1 y_{t} + \dots        \\
                 &amp; =A_1(Ax_t+B^{-1}u_t)+\dots \\
@@ -751,33 +751,31 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <li class="fragment">GDP: unrestricted, since we are interested in its response</li>
 <li class="fragment">CPI: decreases, expect negative inflation</li>
 <li class="fragment">TWI: increases, encourage investing in AUD</li>
-</ul></li>
 </ul>
 <p><span class="math display">\[
-    \begin{align*}
-        \begin{bmatrix}
-            \text{CASH}_t \\
-            \text{GDP}_t  \\
-            \text{CPI}_t  \\
-            \text{TWI}_t  \\
-        \end{bmatrix}
-        =\dots+
-        \begin{bmatrix}
-            +    &amp; \ast &amp; \ast &amp; \ast \\
-            \ast &amp; \ast &amp; \ast &amp; \ast \\
-            -    &amp; \ast &amp; \ast &amp; \ast \\
-            +    &amp; \ast &amp; \ast &amp; \ast \\
-        \end{bmatrix}
-        \begin{bmatrix}
-            u_{t}^{MP} \\
-            u_{2,t}    \\
-            u_{3,t}    \\
-            u_{4,t}    \\
-        \end{bmatrix}
-    \end{align*}
-\]</span></p>
-<ul>
-<li class="fragment">Can extend these restrictions to horizons <span class="math inline">\(1,2,3\)</span></li>
+  \begin{align*}
+      \begin{bmatrix}
+          \text{CASH}_t \\
+          \text{GDP}_t  \\
+          \text{CPI}_t  \\
+          \text{TWI}_t  \\
+      \end{bmatrix}
+      =\dots+
+      \begin{bmatrix}
+          +    &amp; \ast &amp; \ast &amp; \ast \\
+          \ast &amp; \ast &amp; \ast &amp; \ast \\
+          -    &amp; \ast &amp; \ast &amp; \ast \\
+          +    &amp; \ast &amp; \ast &amp; \ast \\
+      \end{bmatrix}
+      \begin{bmatrix}
+          u_{t}^{MP} \\
+          u_{2,t}    \\
+          u_{3,t}    \\
+          u_{4,t}    \\
+      \end{bmatrix}
+\end{align*}
+\]</span></p></li>
+<li class="fragment"><p>Can extend these restrictions to horizons <span class="math inline">\(1,2,3\)</span></p></li>
 </ul>
 </section>
 
