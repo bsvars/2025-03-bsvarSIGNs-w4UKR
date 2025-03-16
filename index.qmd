@@ -18,7 +18,7 @@ format:
     date-format: long
     transition: slide
     fontsize: 10
-# incremental: true
+incremental: true
 cache: true
 smaller: true
 ---
@@ -145,6 +145,12 @@ smaller: true
 
 # An example
 
+```{r}
+set.seed(2025)
+library(bsvarSIGNs)
+head(optimism)
+```
+
 - The `optimism` dataset is available in the `bsvarSIGNs` package
 
 - Contains 5 quarterly US data from 1955Q1 to 2010Q4
@@ -154,15 +160,9 @@ smaller: true
   - real interest rate: federal funds rate minus inflation
   - hours worked: hours of all persons in the non-farm sector, logged
 
-```{r, echo=TRUE}
-library(bsvarSIGNs)
-head(optimism)
-```
-
 # Fitted values
 
-```{r, echo=TRUE}
-set.seed(2025)
+```{r}
 spec <- specify_bsvarSIGN$new(optimism, p = 4)
 post <- estimate(spec, S = 1000, show_progress = FALSE)
 fit <- compute_fitted_values(post)
@@ -172,9 +172,9 @@ plot(fit)
 
 # Forecast
 
-```{r, echo=TRUE}
+```{r}
 forecast <- forecast(post, horizon = 4)
-plot(forecast, data_in_plot = .1)
+plot(forecast, data_in_plot = .2)
 ```
 
 # Structural Vector Autoregression{background-color="#0056B9"}
@@ -371,10 +371,17 @@ plot(forecast, data_in_plot = .1)
 
 - Suppose there is strong evidence for the history of the shocks
 
-- e.g. a negative (unfavorable) supply shock during COVID-19
+- e.g. a negative (unfavorable) supply shock at the begining of COVID-19
+
   $$
-    u_{2020Q1}^S < 0
+  	u_{2020Q1}^S < 0
   $$
+
+- e.g. a negative optimism shock at the begining of Global Financial Crisis starts
+  - a pessimistic shock!
+    $$
+    	u_{2007Q3}^{\text{optimism}} < 0
+    $$
 
 # Sign and zero restriction
 
