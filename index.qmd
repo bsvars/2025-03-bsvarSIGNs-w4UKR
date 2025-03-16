@@ -1,115 +1,658 @@
 ---
-title: "<span style='color: #ffd700;'>Bayesian Structural Vector Autoregressions</span>" 
-author: "<span style='color: #ffd700;'>by Tomasz Woźniak</span>"
-email: "tomasz.wozniak@unimelb.edu.au"
-title-slide-attributes:
-  data-background-color: "#ff69b4"
-number-sections: false
-format: 
-  revealjs: 
-    theme: [simple, theme.scss]
-    slide-number: c
-    transition: concave
-    smaller: true
-    multiplex: true
-execute: 
-  echo: true
+title: Introduction to Empirical Macroeconomics with R
+subtitle: Workshops for Ukraine
+author:
+  - name: Xiaolei (Adam) Wang
+    orcid: 0009-0005-6192-9061
+    # email: adamwang15[at]gmail.com
+    affiliation: University of Melbourne
+# date: last-modified
+format:
+  revealjs:
+    theme:
+      - default
+      - clean.scss
+    menu:
+      side: left
+    slide-number: true
+    date-format: long
+    transition: slide
+    fontsize: 10
+# incremental: true
+cache: true
+smaller: true
 ---
 
-##  {background-color="#ff69b4"}
+# About me
 
-$$ $$
+- PhD student at the University of Melbourne
 
-### Structural Vector Autoregressions {style="color:#ffd700;"}
+- Interested in Bayesian econometrics
 
-### Identification of Structural VARs {style="color:#ffd700;"}
+- Author of the R package `bsvarSIGNs`
 
-### Dynamic Causal Effects {style="color:#ffd700;"}
+# Plan for today
 
-### Bayesian Estimation {style="color:#ffd700;"}
+- Vector Autoregression (VAR)
 
-### Monetary Policy Analysis Using the  [bsvars](https://cran.r-project.org/package=bsvars) Package {style="color:#ffd700;"}
+- Structural Vector Autoregression (SVAR)
 
+- Applications in Macroeconomics
 
+- Excercises
 
+# Vector Autoregression{background-color="#0056B9"}
 
+# Vector Autoregression (VAR)
 
-##  {background-color="#ff69b4"}
+- A VAR model is a `system of equations` where each variable is regressed on its own lagged values and the lagged values of all other variables
 
-![](bsvars.png){.absolute top=30 right=275 width="500"}
+- This allows us to model the dynamic interdependencies
 
+- e.g. a bivariate VAR(1):
 
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			y_{1,t} \\
+  			y_{2,t} \\
+  		\end{bmatrix}
+  		    & =
+  		\begin{bmatrix}
+  			A_{1,11} & A_{1,12} \\
+  			A_{1,21} & A_{1,22} \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			y_{1,t-1} \\
+  			y_{2,t-1} \\
+  		\end{bmatrix}+
+  		\begin{bmatrix}
+  			\varepsilon_{1,t} \\
+  			\varepsilon_{2,t} \\
+  		\end{bmatrix}                   \\
+  		y_t & = A_1 y_{t-1} + \varepsilon_t
+  	\end{align*}
+  $$
 
-## <span style="color: #ffd700;">Materials</span> {background-color="#ff69b4"} 
+- Useful for forecasting, Granger causality test etc.
 
-$$ $$
+# Matrix representation
 
-### Lecture Slides [as a Website](https://bsvars.github.io/2024-10-be24-bsvars) {style="color:#ffd700;"}
+- Generally, a VAR(p) model:
 
-### [R script](https://github.com/bsvars/2024-10-be24-bsvars/blob/main/be24-bsvars.R) for your own Australian monetary policy analysis{style="color:#ffd700;"}
+  $$
+  	\begin{align*}
+  		y_t & = A_1 y_{t-1} + A_2 y_{t-2} + \dots + A_p y_{t-p} + A_dd_t + \varepsilon_t \\
+  		y_t & =
+  		\begin{bmatrix}
+  			A_1 & \dots & A_p & A_d
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			y_{t-1} \\
+  			\vdots  \\
+  			y_{t-p} \\
+  			d_t
+  		\end{bmatrix}
+  		+ \varepsilon_t                                                                  \\
+  	\end{align*}
+  $$
 
-### GitHub [repo](https://github.com/bsvars/2024-10-be24-bsvars) to reproduce the slides and results{style="color:#ffd700;"}
+- Where $d_t$ contains exogenous variables e.g. the constant term
 
-### Tasks{style="color:#ffd700;"}
+- Assuming normal erros, more compactly,
 
+  $$
+  	\begin{align*}
+  		y_t & = Ax_t + \varepsilon_t, & \varepsilon_t & \sim N(0, \Sigma)     \\
+  		Y   & = AX + E,               & E             & \sim MN(0, \Sigma, I)
+  	\end{align*}
+  $$
 
-## <span style="color: #ffd700;">Structural Vector Autoregressions</span> {background-color="#ff69b4"}
+# Bayesian estimation
 
-## Structural Vector Autoregressions
+- Want to estimate $A$ and $\Sigma$, there is a conjugate prior
 
-- go-to models for the analysis of policy effects
+  $$
+  	A|\Sigma\sim MN(\underline{A}, \Sigma, \underline{V}),\quad \Sigma\sim IW(\underline{S}, \underline{\nu})
+  $$
 
-::: incremental
-- facilitate the analysis of **dynamic causal effects** of a well-isolated cause
-- extensively used for: *monetary* and *fiscal* policy, *financial* markets, ...
-- relatively simple to work with data and provide *empirical evidence on the propagation of shocks* through economies and markets
-- provide data-driven stylised facts to be incorporated in theoretical model
-- require identification of the cause of the dynamic effects
-- extendible: *featuring many variations in specification*
-    -   non-normality
-    -   heteroskedasticity
-    -   time-varying parameters
-    -   Bayesian
--   Proposed by [Sims (1980)](https://doi.org/10.2307/1912017)
-:::
+- This generates closed-form posterior distributions
 
-::: footer
-[Bayesian Structural VARs](https://bsvars.github.io/2024-10-be24-bsvars)
-:::
+  $$
+  	A|\Sigma, Y\sim MN(\bar{A}, \Sigma, \bar{V}),\quad \Sigma|Y\sim IW(\bar{S}, \bar{\nu})
+  $$
 
+- $MN$ is the matrix normal distribution
 
+  $$
+  	A\sim MN(M,U,V)\Leftrightarrow vec(A)\sim N(vec(M),V\otimes U)
+  $$
 
-## Structural Vector Autoregressions
+- $IW$ is the inverse Wishart distribution
+  - Distribution for positive-definite matrices (covariance)
+  - A generalization of the inverse gamma distribution
 
-::: footer
-[Bayesian Structural VARs](https://bsvars.github.io/2024-10-be24-bsvars)
-:::
+# Minnesota prior
 
-### The model.
-\begin{align}
-\text{VAR equation: }&& y_t &= \mathbf{A}_1 y_{t-1} + \dots + \mathbf{A}_p y_{t-p} + \boldsymbol\mu_0 + \epsilon_t\\[1ex]
-\text{structural equation: }&& \mathbf{B}\epsilon_t &= u_t\\[1ex]
-\text{structural shocks: }&& u_t |Y_{t-1} &\sim N_N\left(\mathbf{0}_N,\mathbf{I}_N\right)
-\end{align}
+- Still need to decide $\underline{A}$, $\underline{V}$, $\underline{S}$, $\underline{\nu}$
 
-::: {.fragment}
-### Notation.
-- $\mathbf{B}$ - $N\times N$ structural matrix of contemporaneous relationships
-- $u_t$ - $N$-vector of structural shocks at time $t$
-  
-  Isolating these shocks allows us to *identify dynamic effects of
-uncorrelated shocks* on variables $y_t$
+  - for non-stationary variables, set corresponding elements in $\underline{A}$ to 1
+  - Shrink distant lagged coefficients to zero with small values in $\underline{V}$
+  - $\underline{S}=I$
+  - $\underline{\nu}=n+2$
 
-- $\epsilon_t$ - $N$-vector with error terms at time $t$
-- the rest as in the lecture on [Bayesian VARs](https://bsvars.github.io/2024-10-be24-bsvarSIGNs/#/varp-model)
-:::
+- Improves forecast by reducing overfitting
 
+# An example
 
+- The `optimism` dataset is available in the `bsvarSIGNs` package
 
+- Contains 5 quarterly US data from 1955Q1 to 2010Q4
+  - productivity: total factor productivity on [John Fernald’s website](https://www.johnfernald.net/TFP)
+  - stock prices: S&P 500 index divided by CPI, logged
+  - consumption: real consumption expenditures, logged
+  - real interest rate: federal funds rate minus inflation
+  - hours worked: hours of all persons in the non-farm sector, logged
 
+```{r, echo=TRUE}
+library(bsvarSIGNs)
+head(optimism)
+```
 
+# Fitted values
 
-##  {background-color="#ff69b4"}
+```{r, echo=TRUE}
+set.seed(2025)
+spec <- specify_bsvarSIGN$new(optimism, p = 4)
+post <- estimate(spec, S = 1000, show_progress = FALSE)
+fit <- compute_fitted_values(post)
+rownames(fit) <- colnames(optimism)
+plot(fit)
+```
 
-![](social.png){.absolute top=30 right=200 width="800"}
+# Forecast
 
+```{r, echo=TRUE}
+forecast <- forecast(post, horizon = 4)
+plot(forecast, data_in_plot = .1)
+```
+
+# Structural Vector Autoregression{background-color="#0056B9"}
+
+# Structural Vector Autoregression (SVAR)
+
+- Recall the VAR equation
+
+  $$
+  	y_t = Ax_t + \varepsilon_t
+  $$
+
+- SVAR defines a linear relation between $\varepsilon_t$ and strutural shocks $u_t$
+
+  $$
+  	u_t = B\varepsilon_t,\quad u_t\sim N(0, I)
+  $$
+
+- $u_{1,t},\dots,u_{n,t}$ are independent, i.e. $n$ distinct causal drivers
+
+- While $\varepsilon_t$ is a mixture of the structural shocks, causal relation is not clear
+  $$
+    \varepsilon_t = B^{-1}u_t
+  $$
+
+# Simultaneous equation
+
+- SVAR is a system of simultaneous equations
+
+  $$
+  	\begin{align*}
+  		y_t  & = Ax_t + \varepsilon_t \\
+  		y_t  & = Ax_t + B^{-1}u_t     \\
+  		By_t & = BAx_t + u_t
+  	\end{align*}
+  $$
+
+- e.g. suppose supply and demand are determined simultaneously
+
+  $$
+  	\begin{align*}
+  		p_{t} & = -q_t + p_{t-1} + u_{t}^D \\
+  		q_{t} & = p_t + q_{t-1} + u_{t}^S
+  	\end{align*}
+  $$
+
+- In the SVAR notation,
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			1  & 1 \\
+  			-1 & 1 \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t} \\
+  			q_{t} \\
+  		\end{bmatrix}
+  		     & =
+  		\begin{bmatrix}
+  			1 & 0 \\
+  			0 & 1 \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t-1} \\
+  			q_{t-1} \\
+  		\end{bmatrix}+
+  		\begin{bmatrix}
+  			u_{t}^D \\
+  			u_{t}^S \\
+  		\end{bmatrix}           \\
+  		By_t & = BA_1y_{t-1}+u_t
+  	\end{align*}
+  $$
+
+# Identification problem
+
+- After fitting a VAR,
+
+  $$
+  	y_t = Ax_t + \varepsilon_t,\quad \varepsilon_t\sim N(0, \Sigma)
+  $$
+
+- We have $A$ and $\Sigma$, but without restrictions cannot recover $B$
+
+  $$
+  	y_t = Ax_t + B^{-1}u_t,\quad u_t\sim N(0, I)
+  $$
+
+- Since $B$ has $n^2$ elements, and $\Sigma$ has only $n(n+1)/2$ elements
+
+- Need $n(n-1)/2$ restrictions to identify $B$
+
+  - e.g. fix $B^{-1}$ to be lower triangular,
+
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			p_{t} \\
+  			q_{t} \\
+  		\end{bmatrix}
+  		 & =\dots+
+  		\begin{bmatrix}
+  			\ast & 0    \\
+  			\ast & \ast \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			u_{t}^D \\
+  			u_{t}^S \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
+
+- Can be controversial, supply shock has no effect on price on impact?
+
+# Sign restriction 1: $B$
+
+- A less controversial way is to impose sign restrictions
+
+- e.g. demand (supply) curve should have negative (positive) slope
+
+  - higher price $\Rightarrow$ lower (higher) quantity demanded (supplied)
+  - normalize $B_{11}$ and $B_{22}$ positive
+  - restrict $B_{12}$ positive and $B_{21}$ negative
+
+  $$
+  	\begin{align*}
+  		B_{11}p_{t} & = -B_{12}q_t + \dots + u_{t}^D \\
+  		B_{22}q_{t} & = -B_{22}p_t + \dots + u_{t}^S
+  	\end{align*}
+  $$
+
+- In the SVAR notation,
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			+ & + \\
+  			- & + \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t} \\
+  			q_{t} \\
+  		\end{bmatrix}
+  		 & =\dots +
+  		\begin{bmatrix}
+  			u_{t}^D \\
+  			u_{t}^S \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
+
+# Sign restriction 2: IRFs
+
+- There is nothing stopping us from imposing restrictions on $B^{-1}$
+
+- $B^{-1}$ is the impulse response function (IRF) at horizon 0
+
+  $$
+  	y_t = Ax_t + B^{-1}u_t
+  $$
+
+- Back to supply and demand example
+
+  - Demand shock increases price and quantity
+  - Supply shock decreases price and increases quantity
+    $$
+    	\begin{align*}
+    		\begin{bmatrix}
+    			p_{t} \\
+    			q_{t} \\
+    		\end{bmatrix}
+    		 & =\dots +
+    		\begin{bmatrix}
+    			+ & + \\
+    			+ & - \\
+    		\end{bmatrix}
+    		\begin{bmatrix}
+    			u_{t}^D \\
+    			u_{t}^S \\
+    		\end{bmatrix}
+    	\end{align*}
+    $$
+
+- Can impose restrictions on IRFs at further horizons
+  - e.g. $A_1B^{-1}u_t$ at horizon 1
+    $$
+    	\begin{align*}
+    		y_{t+1} & = A_1 y_{t} + \dots        \\
+    		        & =A_1(Ax_t+B^{-1}u_t)+\dots \\
+    		        & =A_1B^{-1}u_t+\dots
+    	\end{align*}
+    $$
+
+# Sign restriction 3: narrative
+
+- Suppose there is strong evidence for the history of the shocks
+
+- e.g. a negative (unfavorable) supply shock during COVID-19
+  $$
+    u_{2020Q1}^S < 0
+  $$
+
+# Sign and zero restriction
+
+- Placing $n(n-1)/2$ zero restrictions can be controversial
+
+- Might desire to impose few zeros and signs on the IRFs
+
+- e.g. back to the `optimism` dataset
+
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			\text{productivity}_t       \\
+  			\text{stock_prices}_t       \\
+  			\text{consumption}_t        \\
+  			\text{real_interest_rate}_t \\
+  			\text{hours_worked}_t       \\
+  		\end{bmatrix}
+  		=\dots+
+  		\begin{bmatrix}
+  			0    & \ast & \ast & \ast & \ast \\
+  			+    & \ast & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast & \ast \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			u_{1,t} \\
+  			u_{2,t} \\
+  			u_{3,t} \\
+  			u_{4,t} \\
+  			u_{5,t} \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
+
+- Can interpret first shock $u_{1,t}$ as an optimistic shock
+  - No effect on productivity
+  - Positive effect on stock prices
+
+# Dynamic causal effects: IRFs
+
+```{r}
+sign_irf <- matrix(NA, 5, 5)
+sign_irf[1, 1] <- 0
+sign_irf[2, 1] <- 1
+spec <- specify_bsvarSIGN$new(optimism * 100, p = 4, sign_irf = sign_irf)
+
+# disable dummy observation priors
+spec$prior$Ysoc <- matrix(NA, nrow(spec$prior$Ysoc), 0)
+spec$prior$Xsoc <- matrix(NA, nrow(spec$prior$Xsoc), 0)
+spec$prior$Ysur <- matrix(NA, nrow(spec$prior$Ysur), 0)
+spec$prior$Xsur <- matrix(NA, nrow(spec$prior$Xsur), 0)
+
+post <- estimate(spec, S = 5000, show_progress = FALSE)
+irf <- compute_impulse_responses(post, 40)
+rownames(irf) <- colnames(optimism)
+plot(irf, probability = 0.68)
+```
+
+# Visualize structural shocks
+
+```{r}
+shocks <- compute_structural_shocks(post)
+plot(shocks)
+```
+
+# Shock contribution: forecast error variance decomposition
+
+```{r}
+fevd <- compute_variance_decompositions(post, 40)
+rownames(fevd) <- colnames(optimism)
+plot(fevd)
+```
+
+# Appliactions in Macroeconomics{background-color="#0056B9"}
+
+# Monetary policies
+
+- According to Wikipedia...
+
+> Monetary policy is the policy adopted by the monetary authority of a nation to affect monetary and other financial conditions to accomplish broader objectives like high employment and price stability.
+
+- Central banks can
+
+  - raise interest rate $\Rightarrow$ save more $\Rightarrow$ less money in market, contractionary
+  - lower interest rate $\Rightarrow$ save less $\Rightarrow$ more money in market, expansionary
+
+- Think of economy like a machine
+  - high inflation/output means overheating, need to cool down, contractionary monetary policy!
+  - low inflation/output means underperforming, need to heat up, expansionary monetary policy!
+
+# Taylor rule
+
+- A simple rule to describe monetary policy
+
+  $$
+  	i_t = r_t + \pi_t + a_\pi(\pi_t-\pi^*) + a_y(y_t-y^*), \quad a_\pi, a_y > 0
+  $$
+
+  - $i_t$: nominal policy interest rate
+  - $r_t$: natural interest rate
+  - $\pi_t$: inflation rate
+  - $\pi^*$: inflation target
+  - $y_t$: GDP
+  - $y^*$: potential GDP
+
+- Raise interest rate (cool down) when inflation/output is too high
+
+- Lower interest rate (heat up) when inflation/output is too low
+
+- Usually, there is some form of the Taylor rule in a SVAR model
+
+# An Australian example
+
+- Is raising interest rate really contractionary?
+
+- Let's analyze the effect of a positive monetary policy shock
+
+- 4 variables, from 1982Q1 to 2019Q4
+  - CASH: cash rate, the policy interest rate in Australia
+  - GDP: real gross domestic product
+  - CPI: trimmed mean consumer price index, a measure of inflation
+  - TWI: trade-weighted exchange rate, higher TWI means stronger AUD
+
+```{r}
+library(readxl)
+data <- read_excel("exercises/monetary.xlsx")
+head(data[, 1:5])
+```
+
+# Contemporaneous relations $B$
+
+- Treat first shock as a monetary policy shock, using the SVAR notation,
+
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			B_{11} & B_{12} & B_{13} & B_{14} \\
+  			B_{21} & B_{22} & B_{23} & B_{24} \\
+  			B_{31} & B_{32} & B_{33} & B_{34} \\
+  			B_{41} & B_{42} & B_{43} & B_{44} \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			\text{CASH}_t \\
+  			\text{GDP}_t  \\
+  			\text{CPI}_t  \\
+  			\text{TWI}_t  \\
+  		\end{bmatrix}
+  		=\dots+
+  		\begin{bmatrix}
+  			u_{t}^{MP} \\
+  			u_{2,t}    \\
+  			u_{3,t}    \\
+  			u_{4,t}    \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
+
+- The first row is similar to the Taylor rule
+
+  $$
+  	B_{11}\text{CASH}_t = -B_{12}\text{GDP}_t - B_{13}\text{CPI}_t - B_{14}\text{TWI}_t + \dots + u_{t}^{MP}
+  $$
+
+- Base on previous discussion, we can restrict
+  - $B_{11}>0$, normalization
+  - $B_{12}<0$, cool down when high GDP
+  - $B_{13}<0$, cool down when high inflation
+  - $B_{14}>0$, discourage investing in AUD when high exchange rate
+
+# IRFs
+
+- Restricting $B$ is not enough, let's consider the IRFs
+
+- What happends to the variables when there is a positive monetary policy shock?
+  - CASH: increases, by definition
+  - GDP: unrestricted, since we are interested in its response
+  - CPI: decreases, expect negative inflation
+  - TWI: increases, encourage investing in AUD
+
+$$
+	\begin{align*}
+		\begin{bmatrix}
+			\text{CASH}_t \\
+			\text{GDP}_t  \\
+			\text{CPI}_t  \\
+			\text{TWI}_t  \\
+		\end{bmatrix}
+		=\dots+
+		\begin{bmatrix}
+			+    & \ast & \ast & \ast \\
+			\ast & \ast & \ast & \ast \\
+			-    & \ast & \ast & \ast \\
+			+    & \ast & \ast & \ast \\
+		\end{bmatrix}
+		\begin{bmatrix}
+			u_{t}^{MP} \\
+			u_{2,t}    \\
+			u_{3,t}    \\
+			u_{4,t}    \\
+		\end{bmatrix}
+	\end{align*}
+$$
+
+- Can extend these restrictions to horizons $1,2,3$
+
+# Result
+
+```{r}
+data[, 3:7] <- 100 * log(data[, 3:7]) # log transformation
+
+# endogenous variables
+Y <- as.matrix(data[, 2:5])
+
+# exogenous variables
+Z <- data[, 6:8] |>
+  as.matrix() |>
+  bsvars::specify_data_matrices$new(p = 4) # 4 lags
+Z <- rbind(matrix(0, 4, 12), t(Z$X[-nrow(Z$X), ])) # pad with zeros
+
+# sign restrictions of +ve monetary policy shock
+# restrictions on impulse response functions
+sign_irf <- matrix(NA, 4, 4)
+sign_irf[1, 1] <- sign_irf[4, 1] <- 1 # +ve impact on cash rate and exchange rate
+sign_irf[3, 1] <- -1 # -ve impact on consumer price index
+sign_irf <- array(sign_irf, c(4, 4, 4)) # last for 4 periods
+
+# restrictions on policy reaction function
+sign_structural <- matrix(NA, 4, 4)
+sign_structural[1, ] <- c(1, -1, -1, 1)
+
+# specify the model
+spec <- specify_bsvarSIGN$new(
+  Y,
+  p = 4,
+  exogenous = Z,
+  sign_irf = sign_irf,
+  sign_structural = sign_structural
+)
+
+# disable dummy observation priors
+spec$prior$Ysoc <- matrix(NA, nrow(spec$prior$Ysoc), 0)
+spec$prior$Xsoc <- matrix(NA, nrow(spec$prior$Xsoc), 0)
+spec$prior$Ysur <- matrix(NA, nrow(spec$prior$Ysur), 0)
+spec$prior$Xsur <- matrix(NA, nrow(spec$prior$Xsur), 0)
+
+# sample posterior draws
+post <- estimate(spec, S = 5000, show_progress = FALSE)
+
+# compute impulse response functions
+irf <- compute_impulse_responses(post, horizon = 20)
+rownames(irf) <- c("Cash Rate", "Real GDP", "CPI", "TWI")
+colnames(irf) <- c("Monetary Policy Shock", "shock 2", "shock 3", "shock aa")
+
+plot(irf, probability = 0.68)
+```
+
+# Excercises{background-color="#0056B9"}
+
+#
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<div style="text-align:center; ">
+
+![](qiuqiu.jpg){width=30% height=30%}
+
+<div style="display: inline-block; text-align:left;">
+
+<i class="fa-solid fa-envelope"></i> adamwang15[at]gmail.com
+
+<i class="fa-brands fa-linkedin"></i> adamwang15
+
+<i class="fa-brands fa-github"></i> adamwang15
+
+<i class="fa-brands fa-bluesky"></i> adamwang15.bsky.social
+
+</div>
+
+</div>
