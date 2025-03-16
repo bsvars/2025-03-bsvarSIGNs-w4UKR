@@ -1,4 +1,4 @@
-set.seed(123)
+set.seed(2025)
 
 library(bsvarSIGNs)
 
@@ -13,11 +13,14 @@ for (t in 2:T) {
 }
 y <- t(y)
 
+##################################################
+################# EDIT THIS PART #################
+sign_structural <- matrix(NA, 2, 2)
+##################################################
+
 # estimate the model
-sign_structural <- B
 spec <- specify_bsvarSIGN$new(y, sign_structural = sign_structural)
 post <- estimate(spec, S = 1000)
 
-# check the results
+# check the result
 apply(post$posterior$B, 1:2, mean)
-apply(post$posterior$A, 1:2, mean)

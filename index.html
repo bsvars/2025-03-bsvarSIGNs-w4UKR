@@ -793,9 +793,103 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 
 <img data-src="index_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
 
-<section id="excercises" class="title-slide slide level1 center" data-background-color="#0056B9">
-<h1>Excercises</h1>
+<section id="exercises" class="title-slide slide level1 center" data-background-color="#0056B9">
+<h1>Exercises</h1>
 
+</section>
+
+<section id="prerequisites" class="title-slide slide level1 center">
+<h1>Prerequisites</h1>
+<ul>
+<li>Install the <code>bsvarSIGNs</code> package</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="fu">install.packages</span>(<span class="st">"bsvarSIGNs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Download files from <a href="https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises">https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises</a></li>
+</ul>
+</section>
+
+<section id="exercise-1" class="title-slide slide level1 center">
+<h1>Exercise 1</h1>
+<ul>
+<li><p>Open the <code>ex1.R</code> file</p></li>
+<li><p>This exercise simulates (log) price and (log) quantity data from the supply and demand example</p>
+<p><span class="math display">\[
+  \begin{align*}
+      \begin{bmatrix}
+          B_{11} &amp; B_{12} \\
+          B_{21} &amp; B_{22} \\
+      \end{bmatrix}
+      \begin{bmatrix}
+          p_{t} \\
+          q_{t} \\
+      \end{bmatrix}
+       &amp; =
+      \begin{bmatrix}
+          A_{1,11} &amp; A_{1,12} \\
+          A_{1,21} &amp; A_{1,22} \\
+      \end{bmatrix}
+      \begin{bmatrix}
+          p_{t-1} \\
+          q_{t-1} \\
+      \end{bmatrix}+
+      \begin{bmatrix}
+          u_{t}^D \\
+          u_{t}^S \\
+      \end{bmatrix}
+  \end{align*}
+\]</span></p></li>
+<li><p>Goal: estimate matrix <span class="math inline">\(B\)</span> by imposing restrictions on</p>
+<ul>
+<li>structural matrix <span class="math inline">\(B\)</span></li>
+</ul></li>
+<li><p>Hint: slide 16</p></li>
+</ul>
+</section>
+
+<section id="exercise-2" class="title-slide slide level1 center">
+<h1>Exercise 2</h1>
+<ul>
+<li><p>Open the <code>ex2.R</code> file</p></li>
+<li><p>This exercise analyzes the Australian monetary policy dataset</p></li>
+<li><p>Goal: replicate the IRF plot by imposing restrictions on</p>
+<ul>
+<li>structural matrix <span class="math inline">\(B\)</span></li>
+<li>IRFs</li>
+</ul></li>
+<li><p>Hint: slide 27 and 28</p></li>
+</ul>
+</section>
+
+<section id="exercise-3" class="title-slide slide level1 center">
+<h1>Exercise 3</h1>
+<ul>
+<li><p>Open the <code>ex3.R</code> file</p></li>
+<li><p>This exercise analyzes the US <code>optimism</code> dataset</p></li>
+<li><p>Goal: replicate the IRF plot by imposing restrictions on</p>
+<ul>
+<li>IRFs</li>
+</ul></li>
+<li><p>Hint: slide 19</p></li>
+</ul>
+</section>
+
+<section id="exercise-4" class="title-slide slide level1 center">
+<h1>Exercise 4</h1>
+<ul>
+<li><p>Open the <code>ex4.R</code> file</p></li>
+<li><p>This exercise extends the analysis on the US <code>optimism</code> dataset</p></li>
+<li><p>Goal: compare IRF plots by additionally imposing</p>
+<ul>
+<li>optimism shock is negative in 2007Q4, the start of the GFC</li>
+</ul></li>
+<li><p>Hint:</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>?specify_narrative</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 <section id="section" class="title-slide slide level1 center">

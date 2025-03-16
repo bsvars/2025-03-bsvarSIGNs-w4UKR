@@ -633,7 +633,96 @@ colnames(irf) <- c("Monetary Policy Shock", "shock 2", "shock 3", "shock aa")
 plot(irf, probability = 0.68)
 ```
 
-# Excercises{background-color="#0056B9"}
+# Exercises{background-color="#0056B9"}
+
+# Prerequisites
+
+- Install the `bsvarSIGNs` package
+
+```{r, echo=TRUE, eval=FALSE}
+install.packages("bsvarSIGNs")
+```
+
+- Download files from [https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises](https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises)
+
+# Exercise 1
+
+- Open the `ex1.R` file
+
+- This exercise simulates (log) price and (log) quantity data from the supply and demand example
+
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			B_{11} & B_{12} \\
+  			B_{21} & B_{22} \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t} \\
+  			q_{t} \\
+  		\end{bmatrix}
+  		 & =
+  		\begin{bmatrix}
+  			A_{1,11} & A_{1,12} \\
+  			A_{1,21} & A_{1,22} \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t-1} \\
+  			q_{t-1} \\
+  		\end{bmatrix}+
+  		\begin{bmatrix}
+  			u_{t}^D \\
+  			u_{t}^S \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
+
+- Goal: estimate matrix $B$ by imposing restrictions on
+
+  - structural matrix $B$
+
+- Hint: slide 16
+
+# Exercise 2
+
+- Open the `ex2.R` file
+
+- This exercise analyzes the Australian monetary policy dataset
+
+- Goal: replicate the IRF plot by imposing restrictions on
+
+  - structural matrix $B$
+  - IRFs
+
+- Hint: slide 27 and 28
+
+# Exercise 3
+
+- Open the `ex3.R` file
+
+- This exercise analyzes the US `optimism` dataset
+
+- Goal: replicate the IRF plot by imposing restrictions on
+
+  - IRFs
+
+- Hint: slide 19
+
+# Exercise 4
+
+- Open the `ex4.R` file
+
+- This exercise extends the analysis on the US `optimism` dataset
+
+- Goal: compare IRF plots by additionally imposing
+
+  - optimism shock is negative in 2007Q4, the start of the GFC
+
+- Hint:
+
+```{r, echo=TRUE}
+?specify_narrative
+```
 
 #
 

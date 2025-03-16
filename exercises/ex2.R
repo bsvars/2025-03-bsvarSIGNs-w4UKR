@@ -1,8 +1,8 @@
-set.seed(123)
+set.seed(2025)
 
 library(bsvarSIGNs)
 
-data <- readxl::read_excel("ecor12749-sup-0001-supinfo/VARData.xlsx")
+data <- readxl::read_excel("monetary.xlsx")
 data[, 3:7] <- 100 * log(data[, 3:7]) # log transformation
 
 # endogenous variables
@@ -14,16 +14,14 @@ Z <- data[, 6:8] |>
   bsvars::specify_data_matrices$new(p = 4) # 4 lags
 Z <- rbind(matrix(0, 4, 12), t(Z$X[-nrow(Z$X), ])) # pad with zeros
 
-# sign restrictions of +ve monetary policy shock
-# restrictions on impulse response functions
-sign_irf <- matrix(NA, 4, 4)
-sign_irf[1, 1] <- sign_irf[4, 1] <- 1 # +ve impact on cash rate and exchange rate
-sign_irf[3, 1] <- -1 # -ve impact on consumer price index
-sign_irf <- array(sign_irf, c(4, 4, 4)) # last for 4 periods
-
-# restrictions on policy reaction function
+##################################################
+################# EDIT THIS PART #################
 sign_structural <- matrix(NA, 4, 4)
-sign_structural[1, ] <- c(1, -1, -1, 1)
+sign_irf <- matrix(NA, 4, 4)
+##################################################
+
+# extend to periods 0,1,2,3
+sign_irf <- array(sign_irf, c(4, 4, 4))
 
 # specify the model
 spec <- specify_bsvarSIGN$new(
@@ -45,8 +43,6 @@ post <- estimate(spec, S = 5000, show_progress = FALSE)
 
 # compute impulse response functions
 irf <- compute_impulse_responses(post, horizon = 20)
-rownames(irf) <- c("Cash Rate", "Real GDP", "CPI", "TWI")
 colnames(irf) <- c("Monetary Policy Shock", "shock 2", "shock 3", "shock aa")
 
-# plot(irf, probability = 0.68)
-# summary(irf)$shock1$variable2
+plot(irf, probability = 0.68)
