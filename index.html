@@ -210,19 +210,39 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="about-me" class="title-slide slide level1 center">
 <h1>About me</h1>
 <ul>
-<li class="fragment"><p>PhD student at the University of Melbourne</p></li>
-<li class="fragment"><p>Interested in Bayesian econometrics</p></li>
-<li class="fragment"><p>Author of the R package <code>bsvarSIGNs</code></p></li>
+<li><p>PhD student at the University of Melbourne</p></li>
+<li><p>Interested in Bayesian econometrics</p></li>
+<li><p>Author of the R package <code>bsvarSIGNs</code></p></li>
 </ul>
+</section>
+
+<section id="section" class="title-slide slide level1 center">
+<h1></h1>
+<div style="text-align:center; ">
+<p><img data-src="bsvarSIGNs.png" style="width:50.0%;height:50.0%"></p>
+</div>
 </section>
 
 <section id="plan-for-today" class="title-slide slide level1 center">
 <h1>Plan for today</h1>
 <ul>
-<li class="fragment"><p>Vector Autoregression (VAR)</p></li>
-<li class="fragment"><p>Structural Vector Autoregression (SVAR)</p></li>
-<li class="fragment"><p>Applications in Macroeconomics</p></li>
-<li class="fragment"><p>Exercises</p></li>
+<li><p>Vector Autoregression (VAR)</p></li>
+<li><p>Structural Vector Autoregression (SVAR)</p></li>
+<li><p>Applications in Macroeconomics</p></li>
+<li><p>Many fun exercises in R!</p></li>
+</ul>
+</section>
+
+<section id="prerequisites" class="title-slide slide level1 center">
+<h1>Prerequisites</h1>
+<ul>
+<li>Install the <code>bsvarSIGNs</code> package</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">install.packages</span>(<span class="st">"bsvarSIGNs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Download files from <a href="https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises">https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises</a></li>
 </ul>
 </section>
 
@@ -234,9 +254,9 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="vector-autoregression-var" class="title-slide slide level1 center">
 <h1>Vector Autoregression (VAR)</h1>
 <ul>
-<li class="fragment"><p>A VAR model is a <code>system of equations</code> where each variable is regressed on its own lagged values and the lagged values of all other variables</p></li>
-<li class="fragment"><p>This allows us to model the dynamic interdependencies</p></li>
-<li class="fragment"><p>e.g.&nbsp;a bivariate VAR(1):</p>
+<li><p>A VAR model is a <code>system of equations</code> where each variable is regressed on its own lagged values and the lagged values of all other variables</p></li>
+<li><p>This allows us to model the linear dynamic interdependencies</p></li>
+<li><p>e.g.&nbsp;a bivariate VAR(1):</p>
 <p><span class="math display">\[
   \begin{align*}
       \begin{bmatrix}
@@ -255,18 +275,33 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
       \begin{bmatrix}
           \varepsilon_{1,t} \\
           \varepsilon_{2,t} \\
-      \end{bmatrix}                   \\
+      \end{bmatrix},
+          &amp; \begin{bmatrix}
+                \varepsilon_{1,t} \\
+                \varepsilon_{2,t} \\
+            \end{bmatrix}
+      ~   &amp; \sim N\left(
+      \begin{bmatrix}
+              0 \\
+              0 \\
+          \end{bmatrix},
+      \begin{bmatrix}
+              \Sigma_{11} &amp; \Sigma_{12} \\
+              \Sigma_{12} &amp; \Sigma_{22} \\
+          \end{bmatrix}
+      \right)                                                 \\
       y_t &amp; = A_1 y_{t-1} + \varepsilon_t
+      ,   &amp; \varepsilon_t                 &amp; \sim N(0, \Sigma)
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>Useful for forecasting, Granger causality test etc.</p></li>
+<li><p>Useful for forecasting, Granger causality test etc.</p></li>
 </ul>
 </section>
 
 <section id="matrix-representation" class="title-slide slide level1 center">
 <h1>Matrix representation</h1>
 <ul>
-<li class="fragment"><p>Generally, a VAR(p) model:</p>
+<li><p>Generally, a VAR(p) model:</p>
 <p><span class="math display">\[
   \begin{align*}
       y_t &amp; = A_1 y_{t-1} + A_2 y_{t-2} + \dots + A_p y_{t-p} + A_dd_t + \varepsilon_t \\
@@ -283,12 +318,11 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
       + \varepsilon_t                                                                  \\
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>Where <span class="math inline">\(d_t\)</span> contains exogenous variables e.g.&nbsp;the constant term</p></li>
-<li class="fragment"><p>Assuming normal erros, more compactly,</p>
+<li><p>Where <span class="math inline">\(d_t\)</span> contains exogenous variables e.g.&nbsp;the constant term</p></li>
+<li><p>More compatly,</p>
 <p><span class="math display">\[
   \begin{align*}
-      y_t &amp; = Ax_t + \varepsilon_t, &amp; \varepsilon_t &amp; \sim N(0, \Sigma)     \\
-      Y   &amp; = AX + E,               &amp; E             &amp; \sim MN(0, \Sigma, I)
+      y_t &amp; = Ax_t + \varepsilon_t, &amp; \varepsilon_t &amp; \sim N(0, \Sigma) \\
   \end{align*}
 \]</span></p></li>
 </ul>
@@ -297,22 +331,22 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="bayesian-estimation" class="title-slide slide level1 center">
 <h1>Bayesian estimation</h1>
 <ul>
-<li class="fragment"><p>Want to estimate <span class="math inline">\(A\)</span> and <span class="math inline">\(\Sigma\)</span>, there is a conjugate prior</p>
+<li><p>Want to estimate <span class="math inline">\(A\)</span> and <span class="math inline">\(\Sigma\)</span>, there is a conjugate prior</p>
 <p><span class="math display">\[
   A|\Sigma\sim MN(\underline{A}, \Sigma, \underline{V}),\quad \Sigma\sim IW(\underline{S}, \underline{\nu})
 \]</span></p></li>
-<li class="fragment"><p>This generates closed-form posterior distributions</p>
+<li><p>This generates closed-form posterior distributions</p>
 <p><span class="math display">\[
-  A|\Sigma, Y\sim MN(\bar{A}, \Sigma, \bar{V}),\quad \Sigma|Y\sim IW(\bar{S}, \bar{\nu})
+  A|\Sigma,\text{data}\sim MN(\bar{A}, \Sigma, \bar{V}),\quad \Sigma|\text{data}\sim IW(\bar{S}, \bar{\nu})
 \]</span></p></li>
-<li class="fragment"><p><span class="math inline">\(MN\)</span> is the matrix normal distribution</p>
+<li><p><span class="math inline">\(MN\)</span> is the matrix normal distribution</p>
 <p><span class="math display">\[
   A\sim MN(M,U,V)\Leftrightarrow \text{vec}(A)\sim N(\text{vec}(M),V\otimes U)
 \]</span></p></li>
-<li class="fragment"><p><span class="math inline">\(IW\)</span> is the inverse Wishart distribution</p>
+<li><p><span class="math inline">\(IW\)</span> is the inverse Wishart distribution</p>
 <ul>
-<li class="fragment">Distribution for positive-definite matrices (covariance)</li>
-<li class="fragment">A generalization of the inverse gamma distribution</li>
+<li>Distribution for positive-definite matrices (covariance)</li>
+<li>A generalization of the inverse gamma distribution</li>
 </ul></li>
 </ul>
 </section>
@@ -320,20 +354,21 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="minnesota-prior" class="title-slide slide level1 center">
 <h1>Minnesota prior</h1>
 <ul>
-<li class="fragment"><p>Still need to decide <span class="math inline">\(\underline{A}\)</span>, <span class="math inline">\(\underline{V}\)</span>, <span class="math inline">\(\underline{S}\)</span>, <span class="math inline">\(\underline{\nu}\)</span></p>
+<li><p>Still need to decide <span class="math inline">\(\underline{A}\)</span>, <span class="math inline">\(\underline{V}\)</span>, <span class="math inline">\(\underline{S}\)</span>, <span class="math inline">\(\underline{\nu}\)</span></p>
 <ul>
-<li class="fragment">for non-stationary variables, set corresponding elements in <span class="math inline">\(\underline{A}\)</span> to 1</li>
-<li class="fragment">Shrink distant lagged coefficients to zero with small values in <span class="math inline">\(\underline{V}\)</span></li>
-<li class="fragment"><span class="math inline">\(\underline{S}=I\)</span></li>
-<li class="fragment"><span class="math inline">\(\underline{\nu}=n+2\)</span></li>
+<li>for non-stationary variables, set corresponding elements in <span class="math inline">\(\underline{A}\)</span> to 1</li>
+<li>Shrink distant lagged coefficients to zero with small values in <span class="math inline">\(\underline{V}\)</span></li>
+<li><span class="math inline">\(\underline{S}=I\)</span>, <span class="math inline">\(\underline{\nu}=n+2\)</span></li>
 </ul></li>
-<li class="fragment"><p>Improves forecast by reducing overfitting</p></li>
+<li><p>Improves forecast by reducing overfitting</p></li>
 </ul>
 </section>
 
 <section id="an-example" class="title-slide slide level1 center">
 <h1>An example</h1>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="fu">library</span>(bsvarSIGNs)</span>
+<span id="cb2-2"><a href=""></a><span class="fu">head</span>(optimism)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     productivity stock_prices consumption real_interest_rate hours_worked
 [1,]    0.2172072    -11.28895   -4.331866        0.008022252    -7.599184
@@ -345,27 +380,64 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 </div>
 </div>
 <ul>
-<li class="fragment"><p>The <code>optimism</code> dataset is available in the <code>bsvarSIGNs</code> package</p></li>
-<li class="fragment"><p>Contains 5 quarterly US data from 1955Q1 to 2010Q4</p>
+<li><p>The <code>optimism</code> dataset is available in the <code>bsvarSIGNs</code> package</p></li>
+<li><p>Contains 5 quarterly US data from 1955Q1 to 2010Q4</p>
 <ul>
-<li class="fragment">productivity: total factor productivity on <a href="https://www.johnfernald.net/TFP">John Fernald’s website</a></li>
-<li class="fragment">stock prices: S&amp;P 500 index divided by CPI, logged</li>
-<li class="fragment">consumption: real consumption expenditures, logged</li>
-<li class="fragment">real interest rate: federal funds rate minus inflation</li>
-<li class="fragment">hours worked: hours of all persons in the non-farm sector, logged</li>
+<li>productivity: total factor productivity on <a href="https://www.johnfernald.net/TFP">John Fernald’s website</a></li>
+<li>stock prices: S&amp;P 500 index divided by CPI, logged</li>
+<li>consumption: real consumption expenditures, logged</li>
+<li>real interest rate: federal funds rate minus inflation</li>
+<li>hours worked: hours of all persons in the non-farm sector, logged</li>
 </ul></li>
+</ul>
+</section>
+
+<section id="estimation-in-r" class="title-slide slide level1 center">
+<h1>Estimation in R</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb4-2"><a href=""></a>spec <span class="ot">&lt;-</span> specify_bsvarSIGN<span class="sc">$</span><span class="fu">new</span>(optimism, <span class="at">p =</span> <span class="dv">4</span>)</span>
+<span id="cb4-3"><a href=""></a>post <span class="ot">&lt;-</span> <span class="fu">estimate</span>(spec, <span class="at">S =</span> <span class="dv">5000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>**************************************************|
+ bsvarSIGNs: Bayesian Structural VAR with sign,   |
+             zero and narrative restrictions      |
+**************************************************|
+ Progress of simulation for 5000 independent draws
+ Press Esc to interrupt the computations
+**************************************************|</code></pre>
+</div>
+</div>
+<ul>
+<li>Two lines of code!</li>
 </ul>
 </section>
 
 <section id="fitted-values" class="title-slide slide level1 center">
 <h1>Fitted values</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>fit <span class="ot">&lt;-</span> <span class="fu">compute_fitted_values</span>(post)</span>
+<span id="cb6-2"><a href=""></a><span class="fu">plot</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
 
 <section id="forecast" class="title-slide slide level1 center">
 <h1>Forecast</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>forecast <span class="ot">&lt;-</span> <span class="fu">forecast</span>(post, <span class="at">horizon =</span> <span class="dv">4</span>)</span>
+<span id="cb7-2"><a href=""></a><span class="fu">plot</span>(forecast, <span class="at">data_in_plot =</span> .<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+
+<section id="exercise-1" class="title-slide slide level1 center">
+<h1>Exercise 1</h1>
+<ul>
+<li><p>Open the <code>ex1.R</code> file</p></li>
+<li><p>Run the whole script to plot the fitted values and forecasts</p></li>
+</ul>
+</section>
 
 <section id="structural-vector-autoregression" class="title-slide slide level1 center" data-background-color="#0056B9">
 <h1>Structural Vector Autoregression</h1>
@@ -375,17 +447,20 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="structural-vector-autoregression-svar" class="title-slide slide level1 center">
 <h1>Structural Vector Autoregression (SVAR)</h1>
 <ul>
-<li class="fragment"><p>Recall the VAR equation</p>
+<li><p>Recall the VAR equation</p>
 <p><span class="math display">\[
   y_t = Ax_t + \varepsilon_t
 \]</span></p></li>
-<li class="fragment"><p>SVAR defines a linear relation between <span class="math inline">\(\varepsilon_t\)</span> and strutural shocks <span class="math inline">\(u_t\)</span></p>
+<li><p>SVAR defines a linear relation between <span class="math inline">\(\varepsilon_t\)</span> and strutural shocks <span class="math inline">\(u_t\)</span></p>
 <p><span class="math display">\[
   u_t = B\varepsilon_t,\quad u_t\sim N(0, I)
 \]</span></p></li>
-<li class="fragment"><p><span class="math inline">\(u_{1,t},\dots,u_{n,t}\)</span> are independent, i.e.&nbsp;<span class="math inline">\(n\)</span> distinct causal drivers</p></li>
-<li class="fragment"><p>While <span class="math inline">\(\varepsilon_t\)</span> is a mixture of the structural shocks, causal relation is not clear <span class="math display">\[
-  \varepsilon_t = B^{-1}u_t
+<li><p><span class="math inline">\(u_{1,t},\dots,u_{n,t}\)</span> are independent with each other and across time</p>
+<ul>
+<li>they are <span class="math inline">\(n\)</span> distinct causal drivers</li>
+</ul></li>
+<li><p>While <span class="math inline">\(\varepsilon_t\)</span> is a mixture of the structural shocks, causal relation is not clear <span class="math display">\[
+  \varepsilon_t = B^{-1}u_t = B_0u_t
 \]</span></p></li>
 </ul>
 </section>
@@ -393,45 +468,38 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="simultaneous-equation" class="title-slide slide level1 center">
 <h1>Simultaneous equation</h1>
 <ul>
-<li class="fragment"><p>SVAR is a system of simultaneous equations</p>
+<li><p>SVAR is a system of simultaneous equations</p>
 <p><span class="math display">\[
   \begin{align*}
       y_t  &amp; = Ax_t + \varepsilon_t \\
-      y_t  &amp; = Ax_t + B^{-1}u_t     \\
+      y_t  &amp; = Ax_t + B_0u_t        \\
       By_t &amp; = BAx_t + u_t
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>e.g.&nbsp;suppose supply and demand are determined simultaneously</p>
+<li><p>e.g.&nbsp;suppose supply and demand are determined simultaneously</p>
 <p><span class="math display">\[
   \begin{align*}
-      p_{t} &amp; = -q_t + p_{t-1} + u_{t}^D \\
-      q_{t} &amp; = p_t + q_{t-1} + u_{t}^S
+      p_{t} &amp; = \frac{-B_{12}}{B_{11}}q_t + \dots + u_{t}^D, &amp; B_{11}&gt;0,B_{12}&gt;0 \\
+      q_{t} &amp; = \frac{-B_{21}}{B_{22}}p_t + \dots + u_{t}^S, &amp; B_{22}&gt;0,B_{21}&lt;0
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>In the SVAR notation, <span class="math display">\[
+<li><p>In the SVAR notation, <span class="math display">\[
   \begin{align*}
       \begin{bmatrix}
-          1  &amp; 1 \\
-          -1 &amp; 1 \\
+          B_{11} &amp; B_{12} \\
+          B_{21} &amp; B_{22} \\
       \end{bmatrix}
       \begin{bmatrix}
           p_{t} \\
           q_{t} \\
       \end{bmatrix}
            &amp; =
-      \begin{bmatrix}
-          1 &amp; 0 \\
-          0 &amp; 1 \\
-      \end{bmatrix}
-      \begin{bmatrix}
-          p_{t-1} \\
-          q_{t-1} \\
-      \end{bmatrix}+
+    \dots+
       \begin{bmatrix}
           u_{t}^D \\
           u_{t}^S \\
       \end{bmatrix}           \\
-      By_t &amp; = BA_1y_{t-1}+u_t
+      By_t &amp; = \dots+u_t
   \end{align*}
 \]</span></p></li>
 </ul>
@@ -440,49 +508,49 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="identification-problem" class="title-slide slide level1 center">
 <h1>Identification problem</h1>
 <ul>
-<li class="fragment"><p>After fitting a VAR,</p>
+<li><p>After fitting a VAR,</p>
 <p><span class="math display">\[
   y_t = Ax_t + \varepsilon_t,\quad \varepsilon_t\sim N(0, \Sigma)
 \]</span></p></li>
-<li class="fragment"><p>We have <span class="math inline">\(A\)</span> and <span class="math inline">\(\Sigma\)</span>, but without restrictions cannot recover <span class="math inline">\(B\)</span></p>
+<li><p>We have <span class="math inline">\(A\)</span> and <span class="math inline">\(\Sigma\)</span>, but without restrictions cannot recover <span class="math inline">\(B\)</span></p>
 <p><span class="math display">\[
   y_t = Ax_t + B^{-1}u_t,\quad u_t\sim N(0, I)
 \]</span></p></li>
-<li class="fragment"><p>Since <span class="math inline">\(B\)</span> has <span class="math inline">\(n^2\)</span> elements, and <span class="math inline">\(\Sigma\)</span> has only <span class="math inline">\(n(n+1)/2\)</span> elements</p></li>
-<li class="fragment"><p>Need <span class="math inline">\(n(n-1)/2\)</span> restrictions to identify <span class="math inline">\(B\)</span></p>
+<li><p>Since <span class="math inline">\(B\)</span> has <span class="math inline">\(n^2\)</span> elements, and <span class="math inline">\(\Sigma\)</span> is symmetric and has only <span class="math inline">\(n(n+1)/2\)</span> elements</p></li>
+<li><p>Need <span class="math inline">\(n(n-1)/2\)</span> restrictions to identify <span class="math inline">\(B\)</span></p>
 <ul>
-<li class="fragment">e.g.&nbsp;fix <span class="math inline">\(B^{-1}\)</span> to be lower triangular,</li>
+<li>e.g.&nbsp;fix <span class="math inline">\(B\)</span> to be lower triangular,</li>
 </ul>
 <p><span class="math display">\[
   \begin{align*}
+      \begin{bmatrix}
+          \ast &amp; 0    \\
+          \ast &amp; \ast \\
+      \end{bmatrix}
       \begin{bmatrix}
           p_{t} \\
           q_{t} \\
       \end{bmatrix}
        &amp; =\dots+
       \begin{bmatrix}
-          \ast &amp; 0    \\
-          \ast &amp; \ast \\
-      \end{bmatrix}
-      \begin{bmatrix}
           u_{t}^D \\
           u_{t}^S \\
       \end{bmatrix}
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>Can be controversial, supply shock has no effect on price on impact?</p></li>
+<li><p>Can be controversial, price does not depend on quantity in demand equation?</p></li>
 </ul>
 </section>
 
 <section id="sign-restriction-1-b" class="title-slide slide level1 center">
 <h1>Sign restriction 1: <span class="math inline">\(B\)</span></h1>
 <ul>
-<li class="fragment"><p>A less controversial way is to impose sign restrictions</p></li>
-<li class="fragment"><p>e.g.&nbsp;demand (supply) curve should have negative (positive) slope</p>
+<li><p>A less controversial way is to impose sign restrictions</p></li>
+<li><p>e.g.&nbsp;demand (supply) curve should have negative (positive) slope</p>
 <ul>
-<li class="fragment">higher price <span class="math inline">\(\Rightarrow\)</span> lower (higher) quantity demanded (supplied)</li>
-<li class="fragment">normalize <span class="math inline">\(B_{11}\)</span> and <span class="math inline">\(B_{22}\)</span> positive</li>
-<li class="fragment">restrict <span class="math inline">\(B_{12}\)</span> positive and <span class="math inline">\(B_{21}\)</span> negative</li>
+<li>higher price <span class="math inline">\(\Rightarrow\)</span> lower (higher) quantity demanded (supplied)</li>
+<li>normalize <span class="math inline">\(B_{11}\)</span> and <span class="math inline">\(B_{22}\)</span> positive</li>
+<li>restrict <span class="math inline">\(B_{12}\)</span> positive and <span class="math inline">\(B_{21}\)</span> negative</li>
 </ul>
 <p><span class="math display">\[
   \begin{align*}
@@ -490,7 +558,7 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
       B_{22}q_{t} &amp; = -B_{22}p_t + \dots + u_{t}^S
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>In the SVAR notation, <span class="math display">\[
+<li><p>In the SVAR notation, <span class="math display">\[
   \begin{align*}
       \begin{bmatrix}
           + &amp; + \\
@@ -510,42 +578,86 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 </ul>
 </section>
 
+<section id="exercise-2" class="title-slide slide level1 center">
+<h1>Exercise 2</h1>
+<ul>
+<li><p>Open the <code>ex2.R</code> file</p></li>
+<li><p>This exercise simulates (log) price and (log) quantity data from</p>
+<p><span class="math display">\[
+  \begin{align*}
+      \begin{bmatrix}
+          1  &amp; 1 \\
+          -1 &amp; 1 \\
+      \end{bmatrix}
+      \begin{bmatrix}
+          p_{t} \\
+          q_{t} \\
+      \end{bmatrix}
+       &amp; =
+      \begin{bmatrix}
+          1 &amp; 0 \\
+          0 &amp; 1 \\
+      \end{bmatrix}
+      \begin{bmatrix}
+          p_{t-1} \\
+          q_{t-1} \\
+      \end{bmatrix}+
+      \begin{bmatrix}
+          u_{t}^D \\
+          u_{t}^S \\
+      \end{bmatrix}
+  \end{align*}
+\]</span></p></li>
+<li><p>Goal: estimate matrix <span class="math inline">\(B\)</span> by imposing restrictions on</p>
+<ul>
+<li>structural matrix <span class="math inline">\(B\)</span></li>
+</ul></li>
+<li><p>Hint: slide 20</p></li>
+</ul>
+</section>
+
 <section id="sign-restriction-2-irfs" class="title-slide slide level1 center">
 <h1>Sign restriction 2: IRFs</h1>
 <ul>
-<li class="fragment"><p>There is nothing stopping us from imposing restrictions on <span class="math inline">\(B^{-1}\)</span></p></li>
-<li class="fragment"><p><span class="math inline">\(B^{-1}\)</span> is the impulse response function (IRF) at horizon 0</p>
+<li><p>There is nothing stopping us from imposing restrictions on <span class="math inline">\(B_0\)</span></p></li>
+<li><p><span class="math inline">\(B_0\)</span> is the impulse response function (IRF) at horizon 0, why?</p>
 <p><span class="math display">\[
-  y_t = Ax_t + B^{-1}u_t
+  y_t = Ax_t + B_0u_t
 \]</span></p></li>
-<li class="fragment"><p>Back to supply and demand example</p>
+<li><p>e.g.&nbsp;consider the <code>optimism</code> dataset, can define optimistic shock as</p>
+<p><span class="math display">\[
+  \begin{align*}
+      \begin{bmatrix}
+          \text{productivity}_t       \\
+          \text{stock_prices}_t       \\
+          \text{consumption}_t        \\
+          \text{real_interest_rate}_t \\
+          \text{hours_worked}_t       \\
+      \end{bmatrix}
+      =\dots+
+      \begin{bmatrix}
+          \ast &amp; \ast &amp; \ast &amp; \ast &amp; \ast \\
+          +    &amp; \ast &amp; \ast &amp; \ast &amp; \ast \\
+          \ast &amp; \ast &amp; \ast &amp; \ast &amp; \ast \\
+          \ast &amp; \ast &amp; \ast &amp; \ast &amp; \ast \\
+          \ast &amp; \ast &amp; \ast &amp; \ast &amp; \ast \\
+      \end{bmatrix}
+      \begin{bmatrix}
+          u_{t}^\text{optimism} \\
+          u_{2,t}               \\
+          u_{3,t}               \\
+          u_{4,t}               \\
+          u_{5,t}               \\
+      \end{bmatrix}
+  \end{align*}
+\]</span></p></li>
+<li><p>Can impose restrictions on IRFs at further horizons</p>
 <ul>
-<li class="fragment">Demand shock increases price and quantity</li>
-<li class="fragment">Supply shock decreases price and increases quantity <span class="math display">\[
+<li>e.g.&nbsp;<span class="math inline">\(A_1B_0\)</span> at horizon 1, etc. <span class="math display">\[
     \begin{align*}
-        \begin{bmatrix}
-            p_{t} \\
-            q_{t} \\
-        \end{bmatrix}
-         &amp; =\dots +
-        \begin{bmatrix}
-            + &amp; + \\
-            + &amp; - \\
-        \end{bmatrix}
-        \begin{bmatrix}
-            u_{t}^D \\
-            u_{t}^S \\
-        \end{bmatrix}
-    \end{align*}
-\]</span></li>
-</ul></li>
-<li class="fragment"><p>Can impose restrictions on IRFs at further horizons</p>
-<ul>
-<li class="fragment">e.g.&nbsp;<span class="math inline">\(A_1B^{-1}\)</span> at horizon 1, etc. <span class="math display">\[
-    \begin{align*}
-        y_{t+1} &amp; = A_1 y_{t} + \dots        \\
-                &amp; =A_1(Ax_t+B^{-1}u_t)+\dots \\
-                &amp; =A_1B^{-1}u_t+\dots
+        y_{t+1} &amp; = A_1 y_{t} + \dots     \\
+                &amp; =A_1(Ax_t+B_0u_t)+\dots \\
+                &amp; =A_1B_0u_t+\dots
     \end{align*}
 \]</span></li>
 </ul></li>
@@ -555,14 +667,14 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="sign-restriction-3-narrative" class="title-slide slide level1 center">
 <h1>Sign restriction 3: narrative</h1>
 <ul>
-<li class="fragment"><p>Suppose there is strong evidence for the history of the shocks</p></li>
-<li class="fragment"><p>e.g.&nbsp;a negative (unfavorable) supply shock at the begining of COVID-19</p>
+<li><p>Suppose there is strong evidence for the history of the shocks</p></li>
+<li><p>e.g.&nbsp;a negative (unfavorable) supply shock at the begining of COVID-19</p>
 <p><span class="math display">\[
   u_{2020Q1}^S &lt; 0
 \]</span></p></li>
-<li class="fragment"><p>e.g.&nbsp;a negative optimism shock at the begining of Global Financial Crisis starts</p>
+<li><p>e.g.&nbsp;a negative optimism shock at the begining of Global Financial Crisis</p>
 <ul>
-<li class="fragment">a pessimistic shock! <span class="math display">\[
+<li>a pessimistic shock! <span class="math display">\[
     u_{2007Q3}^{\text{optimism}} &lt; 0
 \]</span></li>
 </ul></li>
@@ -572,9 +684,9 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="sign-and-zero-restriction" class="title-slide slide level1 center">
 <h1>Sign and zero restriction</h1>
 <ul>
-<li class="fragment"><p>Placing <span class="math inline">\(n(n-1)/2\)</span> zero restrictions can be controversial</p></li>
-<li class="fragment"><p>Might desire to impose few zeros and signs on the IRFs</p></li>
-<li class="fragment"><p>e.g.&nbsp;back to the <code>optimism</code> dataset</p>
+<li><p>Placing <span class="math inline">\(n(n-1)/2\)</span> zero restrictions can be controversial</p></li>
+<li><p>Might desire to impose just few zeros and signs on the IRFs</p></li>
+<li><p>e.g.&nbsp;again the <code>optimism</code> dataset</p>
 <p><span class="math display">\[
   \begin{align*}
       \begin{bmatrix}
@@ -593,18 +705,18 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
           \ast &amp; \ast &amp; \ast &amp; \ast &amp; \ast \\
       \end{bmatrix}
       \begin{bmatrix}
-          u_{1,t} \\
-          u_{2,t} \\
-          u_{3,t} \\
-          u_{4,t} \\
-          u_{5,t} \\
+          u_{t}^\text{optimism} \\
+          u_{2,t}               \\
+          u_{3,t}               \\
+          u_{4,t}               \\
+          u_{5,t}               \\
       \end{bmatrix}
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>Can interpret first shock <span class="math inline">\(u_{1,t}\)</span> as an optimistic shock</p>
+<li><p>Can interpret first shock as an optimistic shock</p>
 <ul>
-<li class="fragment">No effect on productivity</li>
-<li class="fragment">Positive effect on stock prices</li>
+<li>No effect on productivity</li>
+<li>Positive effect on stock prices</li>
 </ul></li>
 </ul>
 </section>
@@ -612,17 +724,46 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="dynamic-causal-effects-irfs" class="title-slide slide level1 center">
 <h1>Dynamic causal effects: IRFs</h1>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
 
 <section id="visualize-structural-shocks" class="title-slide slide level1 center">
 <h1>Visualize structural shocks</h1>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 
 <section id="shock-contribution-forecast-error-variance-decomposition" class="title-slide slide level1 center">
 <h1>Shock contribution: forecast error variance decomposition</h1>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
+
+<section id="exercise-3" class="title-slide slide level1 center">
+<h1>Exercise 3</h1>
+<ul>
+<li><p>Open the <code>ex3.R</code> file</p></li>
+<li><p>This exercise analyzes the US <code>optimism</code> dataset</p></li>
+<li><p>Goal: replicate the IRF plot by imposing restrictions on</p>
+<ul>
+<li>IRFs</li>
+</ul></li>
+<li><p>Hint: slide 24</p></li>
+</ul>
+</section>
+
+<section id="exercise-4" class="title-slide slide level1 center">
+<h1>Exercise 4</h1>
+<ul>
+<li><p>Open the <code>ex4.R</code> file</p></li>
+<li><p>This exercise extends the analysis on the US <code>optimism</code> dataset</p></li>
+<li><p>Goal: compare IRF plots by additionally imposing</p>
+<ul>
+<li>optimism shock is negative in 2007Q4, the start of the GFC</li>
+</ul></li>
+<li><p>Hint: slide 23, row 211 of the dataset corresponds to 2007Q4, and</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>?specify_narrative</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 
 <section id="appliactions-in-macroeconomics" class="title-slide slide level1 center" data-background-color="#0056B9">
 <h1>Appliactions in Macroeconomics</h1>
@@ -632,21 +773,21 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="monetary-policies" class="title-slide slide level1 center">
 <h1>Monetary policies</h1>
 <ul>
-<li class="fragment">According to Wikipedia…</li>
+<li>According to Wikipedia…</li>
 </ul>
 <blockquote>
 <p>Monetary policy is the policy adopted by the monetary authority of a nation to affect monetary and other financial conditions to accomplish broader objectives like high employment and price stability.</p>
 </blockquote>
 <ul>
-<li class="fragment"><p>Central banks can</p>
+<li><p>Central banks can</p>
 <ul>
-<li class="fragment">raise interest rate <span class="math inline">\(\Rightarrow\)</span> save more <span class="math inline">\(\Rightarrow\)</span> less money in market, contractionary</li>
-<li class="fragment">lower interest rate <span class="math inline">\(\Rightarrow\)</span> save less <span class="math inline">\(\Rightarrow\)</span> more money in market, expansionary</li>
+<li>raise interest rate <span class="math inline">\(\Rightarrow\)</span> save more <span class="math inline">\(\Rightarrow\)</span> less money in market, contractionary</li>
+<li>lower interest rate <span class="math inline">\(\Rightarrow\)</span> save less <span class="math inline">\(\Rightarrow\)</span> more money in market, expansionary</li>
 </ul></li>
-<li class="fragment"><p>Think of economy like a machine</p>
+<li><p>Think of economy like a machine</p>
 <ul>
-<li class="fragment">high inflation/output means overheating, need to cool down, contractionary monetary policy!</li>
-<li class="fragment">low inflation/output means underperforming, need to heat up, expansionary monetary policy!</li>
+<li>high inflation/output means overheating, need to cool down, contractionary monetary policy!</li>
+<li>low inflation/output means underperforming, need to heat up, expansionary monetary policy!</li>
 </ul></li>
 </ul>
 </section>
@@ -654,35 +795,35 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="taylor-rule" class="title-slide slide level1 center">
 <h1>Taylor rule</h1>
 <ul>
-<li class="fragment"><p>A simple rule to describe monetary policy</p>
+<li><p>A simple rule to describe monetary policy</p>
 <p><span class="math display">\[
   i_t = r_t + \pi_t + a_\pi(\pi_t-\pi^*) + a_y(y_t-y^*), \quad a_\pi, a_y &gt; 0
 \]</span></p>
 <ul>
-<li class="fragment"><span class="math inline">\(i_t\)</span>: nominal policy interest rate</li>
-<li class="fragment"><span class="math inline">\(r_t\)</span>: natural interest rate</li>
-<li class="fragment"><span class="math inline">\(\pi_t\)</span>: inflation rate</li>
-<li class="fragment"><span class="math inline">\(\pi^*\)</span>: inflation target</li>
-<li class="fragment"><span class="math inline">\(y_t\)</span>: GDP</li>
-<li class="fragment"><span class="math inline">\(y^*\)</span>: potential GDP</li>
+<li><span class="math inline">\(i_t\)</span>: nominal policy interest rate</li>
+<li><span class="math inline">\(r_t\)</span>: natural interest rate</li>
+<li><span class="math inline">\(\pi_t\)</span>: inflation rate</li>
+<li><span class="math inline">\(\pi^*\)</span>: inflation target</li>
+<li><span class="math inline">\(y_t\)</span>: GDP</li>
+<li><span class="math inline">\(y^*\)</span>: potential GDP</li>
 </ul></li>
-<li class="fragment"><p>Raise interest rate (cool down) when inflation/output is too high</p></li>
-<li class="fragment"><p>Lower interest rate (heat up) when inflation/output is too low</p></li>
-<li class="fragment"><p>Usually, there is some form of the Taylor rule in a SVAR model</p></li>
+<li><p>Raise interest rate (cool down) when inflation/output is too high</p></li>
+<li><p>Lower interest rate (heat up) when inflation/output is too low</p></li>
+<li><p>Usually, there is some form of the Taylor rule in a SVAR model</p></li>
 </ul>
 </section>
 
 <section id="an-australian-example" class="title-slide slide level1 center">
 <h1>An Australian example</h1>
 <ul>
-<li class="fragment"><p>Is raising interest rate really contractionary?</p></li>
-<li class="fragment"><p>Let’s analyze the effect of a positive monetary policy shock</p></li>
-<li class="fragment"><p>4 variables, from 1982Q1 to 2019Q4</p>
+<li><p>Is raising interest rate really contractionary?</p></li>
+<li><p>Let’s analyze the effect of a positive monetary policy shock</p></li>
+<li><p>4 variables, from 1982Q1 to 2019Q4</p>
 <ul>
-<li class="fragment">CASH: cash rate, the policy interest rate in Australia</li>
-<li class="fragment">GDP: real gross domestic product</li>
-<li class="fragment">CPI: trimmed mean consumer price index, a measure of inflation</li>
-<li class="fragment">TWI: trade-weighted exchange rate, higher TWI means stronger AUD</li>
+<li>CASH: cash rate, the policy interest rate in Australia</li>
+<li>GDP: real gross domestic product</li>
+<li>CPI: trimmed mean consumer price index, a measure of inflation</li>
+<li>TWI: trade-weighted exchange rate, higher TWI means stronger AUD</li>
 </ul></li>
 </ul>
 <div class="cell">
@@ -703,7 +844,7 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="contemporaneous-relations-b" class="title-slide slide level1 center">
 <h1>Contemporaneous relations <span class="math inline">\(B\)</span></h1>
 <ul>
-<li class="fragment"><p>Treat first shock as a monetary policy shock, using the SVAR notation,</p>
+<li><p>Treat first shock as a monetary policy shock, using the SVAR notation,</p>
 <p><span class="math display">\[
   \begin{align*}
       \begin{bmatrix}
@@ -727,16 +868,16 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
       \end{bmatrix}
   \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>The first row is similar to the Taylor rule</p>
+<li><p>The first row is similar to the Taylor rule</p>
 <p><span class="math display">\[
   B_{11}\text{CASH}_t = -B_{12}\text{GDP}_t - B_{13}\text{CPI}_t - B_{14}\text{TWI}_t + \dots + u_{t}^{MP}
 \]</span></p></li>
-<li class="fragment"><p>Base on previous discussion, we can restrict</p>
+<li><p>Base on previous discussion, we can restrict</p>
 <ul>
-<li class="fragment"><span class="math inline">\(B_{11}&gt;0\)</span>, normalization</li>
-<li class="fragment"><span class="math inline">\(B_{12}&lt;0\)</span>, cool down when high GDP</li>
-<li class="fragment"><span class="math inline">\(B_{13}&lt;0\)</span>, cool down when high inflation</li>
-<li class="fragment"><span class="math inline">\(B_{14}&gt;0\)</span>, discourage investing in AUD when high exchange rate</li>
+<li><span class="math inline">\(B_{11}&gt;0\)</span>, normalization</li>
+<li><span class="math inline">\(B_{12}&lt;0\)</span>, cool down when high GDP</li>
+<li><span class="math inline">\(B_{13}&lt;0\)</span>, cool down when high inflation</li>
+<li><span class="math inline">\(B_{14}&gt;0\)</span>, discourage investing in AUD when high exchange rate</li>
 </ul></li>
 </ul>
 </section>
@@ -744,13 +885,13 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <section id="irfs" class="title-slide slide level1 center">
 <h1>IRFs</h1>
 <ul>
-<li class="fragment"><p>Restricting <span class="math inline">\(B\)</span> is not enough, let’s consider the IRFs</p></li>
-<li class="fragment"><p>What happends to the variables when there is a positive monetary policy shock?</p>
+<li><p>Restricting <span class="math inline">\(B\)</span> is not enough, let’s consider the IRFs</p></li>
+<li><p>What happends to the variables when there is a positive monetary policy shock?</p>
 <ul>
-<li class="fragment">CASH: increases, by definition</li>
-<li class="fragment">GDP: unrestricted, since we are interested in its response</li>
-<li class="fragment">CPI: decreases, expect negative inflation</li>
-<li class="fragment">TWI: increases, encourage investing in AUD</li>
+<li>CASH: increases, by definition</li>
+<li>GDP: unrestricted, since we are interested in its response</li>
+<li>CPI: decreases, expect negative inflation</li>
+<li>TWI: increases, encourage investing in AUD</li>
 </ul>
 <p><span class="math display">\[
   \begin{align*}
@@ -773,117 +914,39 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
           u_{3,t}    \\
           u_{4,t}    \\
       \end{bmatrix}
-\end{align*}
+  \end{align*}
 \]</span></p></li>
-<li class="fragment"><p>Can extend these restrictions to horizons <span class="math inline">\(1,2,3\)</span></p></li>
+<li><p>Can extend these restrictions to horizons <span class="math inline">\(1,2,3\)</span></p></li>
 </ul>
 </section>
 
 <section id="result" class="title-slide slide level1 center">
 <h1>Result</h1>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
 
-<section id="exercises" class="title-slide slide level1 center" data-background-color="#0056B9">
-<h1>Exercises</h1>
-
-</section>
-
-<section id="prerequisites" class="title-slide slide level1 center">
-<h1>Prerequisites</h1>
+<section id="exercise-5" class="title-slide slide level1 center">
+<h1>Exercise 5</h1>
 <ul>
-<li class="fragment">Install the <code>bsvarSIGNs</code> package</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">install.packages</span>(<span class="st">"bsvarSIGNs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<li><p>Open the <code>ex5.R</code> file</p></li>
+<li><p>This exercise analyzes the Australian monetary policy dataset</p></li>
+<li><p>Goal: replicate the IRF plot by imposing restrictions on</p>
 <ul>
-<li class="fragment">Download files from <a href="https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises">https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises</a></li>
-</ul>
-</section>
-
-<section id="exercise-1" class="title-slide slide level1 center">
-<h1>Exercise 1</h1>
-<ul>
-<li class="fragment"><p>Open the <code>ex1.R</code> file</p></li>
-<li class="fragment"><p>This exercise simulates (log) price and (log) quantity data from the supply and demand example</p>
-<p><span class="math display">\[
-  \begin{align*}
-      \begin{bmatrix}
-          B_{11} &amp; B_{12} \\
-          B_{21} &amp; B_{22} \\
-      \end{bmatrix}
-      \begin{bmatrix}
-          p_{t} \\
-          q_{t} \\
-      \end{bmatrix}
-       &amp; =
-      \begin{bmatrix}
-          A_{1,11} &amp; A_{1,12} \\
-          A_{1,21} &amp; A_{1,22} \\
-      \end{bmatrix}
-      \begin{bmatrix}
-          p_{t-1} \\
-          q_{t-1} \\
-      \end{bmatrix}+
-      \begin{bmatrix}
-          u_{t}^D \\
-          u_{t}^S \\
-      \end{bmatrix}
-  \end{align*}
-\]</span></p></li>
-<li class="fragment"><p>Goal: estimate matrix <span class="math inline">\(B\)</span> by imposing restrictions on</p>
-<ul>
-<li class="fragment">structural matrix <span class="math inline">\(B\)</span></li>
+<li>structural matrix <span class="math inline">\(B\)</span></li>
+<li>IRFs</li>
 </ul></li>
-<li class="fragment"><p>Hint: slide 16</p></li>
+<li><p>Hint: slide 27 and 28</p></li>
 </ul>
 </section>
 
-<section id="exercise-2" class="title-slide slide level1 center">
-<h1>Exercise 2</h1>
-<ul>
-<li class="fragment"><p>Open the <code>ex2.R</code> file</p></li>
-<li class="fragment"><p>This exercise analyzes the Australian monetary policy dataset</p></li>
-<li class="fragment"><p>Goal: replicate the IRF plot by imposing restrictions on</p>
-<ul>
-<li class="fragment">structural matrix <span class="math inline">\(B\)</span></li>
-<li class="fragment">IRFs</li>
-</ul></li>
-<li class="fragment"><p>Hint: slide 27 and 28</p></li>
-</ul>
-</section>
-
-<section id="exercise-3" class="title-slide slide level1 center">
-<h1>Exercise 3</h1>
-<ul>
-<li class="fragment"><p>Open the <code>ex3.R</code> file</p></li>
-<li class="fragment"><p>This exercise analyzes the US <code>optimism</code> dataset</p></li>
-<li class="fragment"><p>Goal: replicate the IRF plot by imposing restrictions on</p>
-<ul>
-<li class="fragment">IRFs</li>
-</ul></li>
-<li class="fragment"><p>Hint: slide 19</p></li>
-</ul>
-</section>
-
-<section id="exercise-4" class="title-slide slide level1 center">
-<h1>Exercise 4</h1>
-<ul>
-<li class="fragment"><p>Open the <code>ex4.R</code> file</p></li>
-<li class="fragment"><p>This exercise extends the analysis on the US <code>optimism</code> dataset</p></li>
-<li class="fragment"><p>Goal: compare IRF plots by additionally imposing</p>
-<ul>
-<li class="fragment">optimism shock is negative in 2007Q4, the start of the GFC</li>
-</ul></li>
-<li class="fragment"><p>Hint:</p></li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>?specify_narrative</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="section-1" class="title-slide slide level1 center">
+<h1></h1>
+<div style="text-align:center; ">
+<p><img data-src="social.png" style="width:100.0%;height:100.0%"></p>
 </div>
 </section>
 
-<section id="section" class="title-slide slide level1 center">
+<section id="section-2" class="title-slide slide level1 center">
 <h1></h1>
 <p><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></p>
 <div style="text-align:center; ">

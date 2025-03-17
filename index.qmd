@@ -18,7 +18,7 @@ format:
     date-format: long
     transition: slide
     fontsize: 10
-incremental: true
+# incremental: true
 cache: true
 smaller: true
 ---
@@ -31,6 +31,14 @@ smaller: true
 
 - Author of the R package `bsvarSIGNs`
 
+#
+
+<div style="text-align:center; ">
+
+![](bsvarSIGNs.png){width=50% height=50%}
+
+</div>
+
 # Plan for today
 
 - Vector Autoregression (VAR)
@@ -39,7 +47,17 @@ smaller: true
 
 - Applications in Macroeconomics
 
-- Exercises
+- Many fun exercises in R!
+
+# Prerequisites
+
+- Install the `bsvarSIGNs` package
+
+```{r, echo=TRUE, eval=FALSE}
+install.packages("bsvarSIGNs")
+```
+
+- Download files from [https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises](https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises)
 
 # Vector Autoregression{background-color="#0056B9"}
 
@@ -47,7 +65,7 @@ smaller: true
 
 - A VAR model is a `system of equations` where each variable is regressed on its own lagged values and the lagged values of all other variables
 
-- This allows us to model the dynamic interdependencies
+- This allows us to model the linear dynamic interdependencies
 
 - e.g. a bivariate VAR(1):
 
@@ -69,8 +87,23 @@ smaller: true
   		\begin{bmatrix}
   			\varepsilon_{1,t} \\
   			\varepsilon_{2,t} \\
-  		\end{bmatrix}                   \\
+  		\end{bmatrix},
+  		    & \begin{bmatrix}
+  			      \varepsilon_{1,t} \\
+  			      \varepsilon_{2,t} \\
+  		      \end{bmatrix}
+  		~   & \sim N\left(
+  		\begin{bmatrix}
+  				0 \\
+  				0 \\
+  			\end{bmatrix},
+  		\begin{bmatrix}
+  				\Sigma_{11} & \Sigma_{12} \\
+  				\Sigma_{12} & \Sigma_{22} \\
+  			\end{bmatrix}
+  		\right)                                                 \\
   		y_t & = A_1 y_{t-1} + \varepsilon_t
+  		,   & \varepsilon_t                 & \sim N(0, \Sigma)
   	\end{align*}
   $$
 
@@ -99,12 +132,11 @@ smaller: true
 
 - Where $d_t$ contains exogenous variables e.g. the constant term
 
-- Assuming normal erros, more compactly,
+- More compatly,
 
   $$
   	\begin{align*}
-  		y_t & = Ax_t + \varepsilon_t, & \varepsilon_t & \sim N(0, \Sigma)     \\
-  		Y   & = AX + E,               & E             & \sim MN(0, \Sigma, I)
+  		y_t & = Ax_t + \varepsilon_t, & \varepsilon_t & \sim N(0, \Sigma) \\
   	\end{align*}
   $$
 
@@ -119,7 +151,7 @@ smaller: true
 - This generates closed-form posterior distributions
 
   $$
-  	A|\Sigma, Y\sim MN(\bar{A}, \Sigma, \bar{V}),\quad \Sigma|Y\sim IW(\bar{S}, \bar{\nu})
+  	A|\Sigma,\text{data}\sim MN(\bar{A}, \Sigma, \bar{V}),\quad \Sigma|\text{data}\sim IW(\bar{S}, \bar{\nu})
   $$
 
 - $MN$ is the matrix normal distribution
@@ -138,15 +170,13 @@ smaller: true
 
   - for non-stationary variables, set corresponding elements in $\underline{A}$ to 1
   - Shrink distant lagged coefficients to zero with small values in $\underline{V}$
-  - $\underline{S}=I$
-  - $\underline{\nu}=n+2$
+  - $\underline{S}=I$, $\underline{\nu}=n+2$
 
 - Improves forecast by reducing overfitting
 
 # An example
 
-```{r}
-set.seed(2025)
+```{r, echo=TRUE}
 library(bsvarSIGNs)
 head(optimism)
 ```
@@ -160,22 +190,35 @@ head(optimism)
   - real interest rate: federal funds rate minus inflation
   - hours worked: hours of all persons in the non-farm sector, logged
 
+# Estimation in R
+
+```{r, echo=TRUE}
+set.seed(2025)
+spec <- specify_bsvarSIGN$new(optimism, p = 4)
+post <- estimate(spec, S = 5000)
+```
+
+- Two lines of code!
+
 # Fitted values
 
-```{r}
-spec <- specify_bsvarSIGN$new(optimism, p = 4)
-post <- estimate(spec, S = 1000, show_progress = FALSE)
+```{r, echo=TRUE}
 fit <- compute_fitted_values(post)
-rownames(fit) <- colnames(optimism)
 plot(fit)
 ```
 
 # Forecast
 
-```{r}
+```{r, echo=TRUE}
 forecast <- forecast(post, horizon = 4)
 plot(forecast, data_in_plot = .2)
 ```
+
+# Exercise 1
+
+- Open the `ex1.R` file
+
+- Run the whole script to plot the fitted values and forecasts
 
 # Structural Vector Autoregression{background-color="#0056B9"}
 
@@ -193,11 +236,13 @@ plot(forecast, data_in_plot = .2)
   	u_t = B\varepsilon_t,\quad u_t\sim N(0, I)
   $$
 
-- $u_{1,t},\dots,u_{n,t}$ are independent, i.e. $n$ distinct causal drivers
+- $u_{1,t},\dots,u_{n,t}$ are independent with each other and across time
+
+  - they are $n$ distinct causal drivers
 
 - While $\varepsilon_t$ is a mixture of the structural shocks, causal relation is not clear
   $$
-    \varepsilon_t = B^{-1}u_t
+    \varepsilon_t = B^{-1}u_t = B_0u_t
   $$
 
 # Simultaneous equation
@@ -207,7 +252,7 @@ plot(forecast, data_in_plot = .2)
   $$
   	\begin{align*}
   		y_t  & = Ax_t + \varepsilon_t \\
-  		y_t  & = Ax_t + B^{-1}u_t     \\
+  		y_t  & = Ax_t + B_0u_t        \\
   		By_t & = BAx_t + u_t
   	\end{align*}
   $$
@@ -216,8 +261,8 @@ plot(forecast, data_in_plot = .2)
 
   $$
   	\begin{align*}
-  		p_{t} & = -q_t + p_{t-1} + u_{t}^D \\
-  		q_{t} & = p_t + q_{t-1} + u_{t}^S
+  		p_{t} & = \frac{-B_{12}}{B_{11}}q_t + \dots + u_{t}^D, & B_{11}>0,B_{12}>0 \\
+  		q_{t} & = \frac{-B_{21}}{B_{22}}p_t + \dots + u_{t}^S, & B_{22}>0,B_{21}<0
   	\end{align*}
   $$
 
@@ -225,27 +270,20 @@ plot(forecast, data_in_plot = .2)
   $$
   	\begin{align*}
   		\begin{bmatrix}
-  			1  & 1 \\
-  			-1 & 1 \\
+  			B_{11} & B_{12} \\
+  			B_{21} & B_{22} \\
   		\end{bmatrix}
   		\begin{bmatrix}
   			p_{t} \\
   			q_{t} \\
   		\end{bmatrix}
   		     & =
-  		\begin{bmatrix}
-  			1 & 0 \\
-  			0 & 1 \\
-  		\end{bmatrix}
-  		\begin{bmatrix}
-  			p_{t-1} \\
-  			q_{t-1} \\
-  		\end{bmatrix}+
+      \dots+
   		\begin{bmatrix}
   			u_{t}^D \\
   			u_{t}^S \\
   		\end{bmatrix}           \\
-  		By_t & = BA_1y_{t-1}+u_t
+  		By_t & = \dots+u_t
   	\end{align*}
   $$
 
@@ -263,23 +301,23 @@ plot(forecast, data_in_plot = .2)
   	y_t = Ax_t + B^{-1}u_t,\quad u_t\sim N(0, I)
   $$
 
-- Since $B$ has $n^2$ elements, and $\Sigma$ has only $n(n+1)/2$ elements
+- Since $B$ has $n^2$ elements, and $\Sigma$ is symmetric and has only $n(n+1)/2$ elements
 
 - Need $n(n-1)/2$ restrictions to identify $B$
 
-  - e.g. fix $B^{-1}$ to be lower triangular,
+  - e.g. fix $B$ to be lower triangular,
 
   $$
   	\begin{align*}
+  		\begin{bmatrix}
+  			\ast & 0    \\
+  			\ast & \ast \\
+  		\end{bmatrix}
   		\begin{bmatrix}
   			p_{t} \\
   			q_{t} \\
   		\end{bmatrix}
   		 & =\dots+
-  		\begin{bmatrix}
-  			\ast & 0    \\
-  			\ast & \ast \\
-  		\end{bmatrix}
   		\begin{bmatrix}
   			u_{t}^D \\
   			u_{t}^S \\
@@ -287,7 +325,7 @@ plot(forecast, data_in_plot = .2)
   	\end{align*}
   $$
 
-- Can be controversial, supply shock has no effect on price on impact?
+- Can be controversial, price does not depend on quantity in demand equation?
 
 # Sign restriction 1: $B$
 
@@ -325,45 +363,90 @@ plot(forecast, data_in_plot = .2)
   	\end{align*}
   $$
 
+# Exercise 2
+
+- Open the `ex2.R` file
+
+- This exercise simulates (log) price and (log) quantity data from
+
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			1  & 1 \\
+  			-1 & 1 \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t} \\
+  			q_{t} \\
+  		\end{bmatrix}
+  		 & =
+  		\begin{bmatrix}
+  			1 & 0 \\
+  			0 & 1 \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			p_{t-1} \\
+  			q_{t-1} \\
+  		\end{bmatrix}+
+  		\begin{bmatrix}
+  			u_{t}^D \\
+  			u_{t}^S \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
+
+- Goal: estimate matrix $B$ by imposing restrictions on
+
+  - structural matrix $B$
+
+- Hint: slide 20
+
 # Sign restriction 2: IRFs
 
-- There is nothing stopping us from imposing restrictions on $B^{-1}$
+- There is nothing stopping us from imposing restrictions on $B_0$
 
-- $B^{-1}$ is the impulse response function (IRF) at horizon 0
+- $B_0$ is the impulse response function (IRF) at horizon 0, why?
 
   $$
-  	y_t = Ax_t + B^{-1}u_t
+  	y_t = Ax_t + B_0u_t
   $$
 
-- Back to supply and demand example
+- e.g. consider the `optimism` dataset, can define optimistic shock as
 
-  - Demand shock increases price and quantity
-  - Supply shock decreases price and increases quantity
-    $$
-    	\begin{align*}
-    		\begin{bmatrix}
-    			p_{t} \\
-    			q_{t} \\
-    		\end{bmatrix}
-    		 & =\dots +
-    		\begin{bmatrix}
-    			+ & + \\
-    			+ & - \\
-    		\end{bmatrix}
-    		\begin{bmatrix}
-    			u_{t}^D \\
-    			u_{t}^S \\
-    		\end{bmatrix}
-    	\end{align*}
-    $$
+  $$
+  	\begin{align*}
+  		\begin{bmatrix}
+  			\text{productivity}_t       \\
+  			\text{stock_prices}_t       \\
+  			\text{consumption}_t        \\
+  			\text{real_interest_rate}_t \\
+  			\text{hours_worked}_t       \\
+  		\end{bmatrix}
+  		=\dots+
+  		\begin{bmatrix}
+  			\ast & \ast & \ast & \ast & \ast \\
+  			+    & \ast & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast & \ast \\
+  			\ast & \ast & \ast & \ast & \ast \\
+  		\end{bmatrix}
+  		\begin{bmatrix}
+  			u_{t}^\text{optimism} \\
+  			u_{2,t}               \\
+  			u_{3,t}               \\
+  			u_{4,t}               \\
+  			u_{5,t}               \\
+  		\end{bmatrix}
+  	\end{align*}
+  $$
 
 - Can impose restrictions on IRFs at further horizons
-  - e.g. $A_1B^{-1}$ at horizon 1, etc.
+  - e.g. $A_1B_0$ at horizon 1, etc.
     $$
     	\begin{align*}
-    		y_{t+1} & = A_1 y_{t} + \dots        \\
-    		        & =A_1(Ax_t+B^{-1}u_t)+\dots \\
-    		        & =A_1B^{-1}u_t+\dots
+    		y_{t+1} & = A_1 y_{t} + \dots     \\
+    		        & =A_1(Ax_t+B_0u_t)+\dots \\
+    		        & =A_1B_0u_t+\dots
     	\end{align*}
     $$
 
@@ -377,7 +460,7 @@ plot(forecast, data_in_plot = .2)
   	u_{2020Q1}^S < 0
   $$
 
-- e.g. a negative optimism shock at the begining of Global Financial Crisis starts
+- e.g. a negative optimism shock at the begining of Global Financial Crisis
   - a pessimistic shock!
     $$
     	u_{2007Q3}^{\text{optimism}} < 0
@@ -387,9 +470,9 @@ plot(forecast, data_in_plot = .2)
 
 - Placing $n(n-1)/2$ zero restrictions can be controversial
 
-- Might desire to impose few zeros and signs on the IRFs
+- Might desire to impose just few zeros and signs on the IRFs
 
-- e.g. back to the `optimism` dataset
+- e.g. again the `optimism` dataset
 
   $$
   	\begin{align*}
@@ -409,16 +492,16 @@ plot(forecast, data_in_plot = .2)
   			\ast & \ast & \ast & \ast & \ast \\
   		\end{bmatrix}
   		\begin{bmatrix}
-  			u_{1,t} \\
-  			u_{2,t} \\
-  			u_{3,t} \\
-  			u_{4,t} \\
-  			u_{5,t} \\
+  			u_{t}^\text{optimism} \\
+  			u_{2,t}               \\
+  			u_{3,t}               \\
+  			u_{4,t}               \\
+  			u_{5,t}               \\
   		\end{bmatrix}
   	\end{align*}
   $$
 
-- Can interpret first shock $u_{1,t}$ as an optimistic shock
+- Can interpret first shock as an optimistic shock
   - No effect on productivity
   - Positive effect on stock prices
 
@@ -455,6 +538,34 @@ plot(shocks)
 fevd <- compute_variance_decompositions(post, 40)
 rownames(fevd) <- colnames(optimism)
 plot(fevd)
+```
+
+# Exercise 3
+
+- Open the `ex3.R` file
+
+- This exercise analyzes the US `optimism` dataset
+
+- Goal: replicate the IRF plot by imposing restrictions on
+
+  - IRFs
+
+- Hint: slide 24
+
+# Exercise 4
+
+- Open the `ex4.R` file
+
+- This exercise extends the analysis on the US `optimism` dataset
+
+- Goal: compare IRF plots by additionally imposing
+
+  - optimism shock is negative in 2007Q4, the start of the GFC
+
+- Hint: slide 23, row 211 of the dataset corresponds to 2007Q4, and
+
+```{r, echo=TRUE}
+?specify_narrative
 ```
 
 # Appliactions in Macroeconomics{background-color="#0056B9"}
@@ -585,7 +696,7 @@ head(data[, 1:5])
   			u_{3,t}    \\
   			u_{4,t}    \\
   		\end{bmatrix}
-  \end{align*}
+  	\end{align*}
   $$
 
 - Can extend these restrictions to horizons $1,2,3$
@@ -641,59 +752,9 @@ colnames(irf) <- c("Monetary Policy Shock", "shock 2", "shock 3", "shock aa")
 plot(irf, probability = 0.68)
 ```
 
-# Exercises{background-color="#0056B9"}
+# Exercise 5
 
-# Prerequisites
-
-- Install the `bsvarSIGNs` package
-
-```{r, echo=TRUE, eval=FALSE}
-install.packages("bsvarSIGNs")
-```
-
-- Download files from [https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises](https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises)
-
-# Exercise 1
-
-- Open the `ex1.R` file
-
-- This exercise simulates (log) price and (log) quantity data from the supply and demand example
-
-  $$
-  	\begin{align*}
-  		\begin{bmatrix}
-  			B_{11} & B_{12} \\
-  			B_{21} & B_{22} \\
-  		\end{bmatrix}
-  		\begin{bmatrix}
-  			p_{t} \\
-  			q_{t} \\
-  		\end{bmatrix}
-  		 & =
-  		\begin{bmatrix}
-  			A_{1,11} & A_{1,12} \\
-  			A_{1,21} & A_{1,22} \\
-  		\end{bmatrix}
-  		\begin{bmatrix}
-  			p_{t-1} \\
-  			q_{t-1} \\
-  		\end{bmatrix}+
-  		\begin{bmatrix}
-  			u_{t}^D \\
-  			u_{t}^S \\
-  		\end{bmatrix}
-  	\end{align*}
-  $$
-
-- Goal: estimate matrix $B$ by imposing restrictions on
-
-  - structural matrix $B$
-
-- Hint: slide 16
-
-# Exercise 2
-
-- Open the `ex2.R` file
+- Open the `ex5.R` file
 
 - This exercise analyzes the Australian monetary policy dataset
 
@@ -704,33 +765,13 @@ install.packages("bsvarSIGNs")
 
 - Hint: slide 27 and 28
 
-# Exercise 3
+#
 
-- Open the `ex3.R` file
+<div style="text-align:center; ">
 
-- This exercise analyzes the US `optimism` dataset
+![](social.png){width=100% height=100%}
 
-- Goal: replicate the IRF plot by imposing restrictions on
-
-  - IRFs
-
-- Hint: slide 19
-
-# Exercise 4
-
-- Open the `ex4.R` file
-
-- This exercise extends the analysis on the US `optimism` dataset
-
-- Goal: compare IRF plots by additionally imposing
-
-  - optimism shock is negative in 2007Q4, the start of the GFC
-
-- Hint:
-
-```{r, echo=TRUE}
-?specify_narrative
-```
+</div>
 
 #
 
