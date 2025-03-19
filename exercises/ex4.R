@@ -8,7 +8,6 @@ data(optimism)
 ##################################################
 ################# EDIT THIS PART #################
 sign_irf <- matrix(NA, 5, 5)
-sign_irf <- matrix(NA, 5, 5)
 narrative <- specify_narrative(start = 5)
 ##################################################
 

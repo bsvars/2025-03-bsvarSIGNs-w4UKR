@@ -183,12 +183,16 @@ head(optimism)
 
 - The `optimism` dataset is available in the `bsvarSIGNs` package
 
-- Contains 5 quarterly US data from 1955Q1 to 2010Q4
+- Contains 5 quarterly US data from 1955Q1 to 2010Q4[^1]
   - productivity: total factor productivity on [John Fernald’s website](https://www.johnfernald.net/TFP)
   - stock prices: S&P 500 index divided by CPI, logged
   - consumption: real consumption expenditures, logged
   - real interest rate: federal funds rate minus inflation
   - hours worked: hours of all persons in the non-farm sector, logged
+
+<br/>
+
+[^1]: [Beaudry, P., Nam, D., & Wang, J. (2011)](https://doi.org/10.3386/w17651), [Arias, J. E., Rubio‐Ramírez, J. F., & Waggoner, D. F. (2018)](https://doi.org/10.3982/ECTA14468)
 
 # Estimation in R
 
@@ -532,14 +536,6 @@ shocks <- compute_structural_shocks(post)
 plot(shocks)
 ```
 
-# Shock contribution: forecast error variance decomposition
-
-```{r}
-fevd <- compute_variance_decompositions(post, 40)
-rownames(fevd) <- colnames(optimism)
-plot(fevd)
-```
-
 # Exercise 3
 
 - Open the `ex3.R` file
@@ -612,7 +608,7 @@ plot(fevd)
 
 - Let's analyze the effect of a positive monetary policy shock
 
-- 4 variables, from 1982Q1 to 2019Q4
+- 4 variables, from 1982Q1 to 2019Q4[^2]
   - CASH: cash rate, the policy interest rate in Australia
   - GDP: real gross domestic product
   - CPI: trimmed mean consumer price index, a measure of inflation
@@ -623,6 +619,10 @@ library(readxl)
 data <- read_excel("exercises/monetary.xlsx")
 head(data[, 1:5])
 ```
+
+<br/>
+
+[^2]: [Read, M. (2023)](https://doi.org/10.1111/1475-4932.12749)
 
 # Contemporaneous relations $B$
 
