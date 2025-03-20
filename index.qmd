@@ -772,7 +772,7 @@ plot(irf, probability = 0.68)
   - IRFs
   - 1 for positive, -1 for negative, NA for unrestricted
 
-- Hint: slide 27 and 28
+- Hint: slide 33 and 34
 
 #
 
