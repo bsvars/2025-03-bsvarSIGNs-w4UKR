@@ -18,7 +18,7 @@ format:
     date-format: long
     transition: slide
     fontsize: 10
-incremental: true
+# incremental: true
 cache: true
 smaller: true
 ---
@@ -55,6 +55,12 @@ smaller: true
 
 ```{r, echo=TRUE, eval=FALSE}
 install.packages("bsvarSIGNs")
+```
+
+- Install the `readxl` package
+
+```{r, echo=TRUE, eval=FALSE}
+install.packages("readxl")
 ```
 
 - Download files from [https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises](https://github.com/bsvars/2025-03-bsvarSIGNs-w4UKR/tree/master/exercises)
