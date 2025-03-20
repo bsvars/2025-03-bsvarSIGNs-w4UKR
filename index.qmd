@@ -402,6 +402,7 @@ plot(forecast, data_in_plot = .2)
 - Goal: estimate matrix $B$ by imposing restrictions on
 
   - structural matrix $B$
+  - 1 for positive, -1 for negative, NA for unrestricted
 
 - Hint: slide 20
 
@@ -545,6 +546,7 @@ plot(shocks)
 - Goal: replicate the IRF plot by imposing restrictions on
 
   - IRFs
+  - 1 for positive, -1 for negative, NA for unrestricted, 0 for zero
 
 - Hint: slide 24
 
@@ -762,6 +764,7 @@ plot(irf, probability = 0.68)
 
   - structural matrix $B$
   - IRFs
+  - 1 for positive, -1 for negative, NA for unrestricted
 
 - Hint: slide 27 and 28
 
