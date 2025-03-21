@@ -271,8 +271,8 @@ plot(forecast, data_in_plot = .2)
 
   $$
   	\begin{align*}
-  		p_{t} & = \frac{-B_{12}}{B_{11}}q_t + \dots + u_{t}^D, & B_{11}>0,B_{12}>0 \\
-  		q_{t} & = \frac{-B_{21}}{B_{22}}p_t + \dots + u_{t}^S, & B_{22}>0,B_{21}<0
+  		p_{t} & = \frac{-B_{12}}{B_{11}}q_t + \dots + \frac{1}{B_{11}}u_{t}^D, & B_{11}>0,B_{12}>0 \\
+  		q_{t} & = \frac{-B_{21}}{B_{22}}p_t + \dots + \frac{1}{B_{22}}u_{t}^S, & B_{22}>0,B_{21}<0
   	\end{align*}
   $$
 
@@ -350,7 +350,7 @@ plot(forecast, data_in_plot = .2)
   $$
   	\begin{align*}
   		B_{11}p_{t} & = -B_{12}q_t + \dots + u_{t}^D \\
-  		B_{22}q_{t} & = -B_{22}p_t + \dots + u_{t}^S
+  		B_{22}q_{t} & = -B_{21}p_t + \dots + u_{t}^S
   	\end{align*}
   $$
 
@@ -564,9 +564,9 @@ plot(shocks)
 
 - Goal: compare IRF plots by additionally imposing
 
-  - optimism shock is negative in 2007Q4, the start of the GFC
+  - optimism shock is negative in 2007Q3, the start of the GFC
 
-- Hint: slide 23, row 211 of the dataset corresponds to 2007Q4, and
+- Hint: slide 23, row 211 of the dataset corresponds to 2007Q3, and
 
 ```{r, echo=TRUE}
 ?specify_narrative

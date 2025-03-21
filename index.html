@@ -486,8 +486,8 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <li><p>e.g.&nbsp;suppose supply and demand are determined simultaneously</p>
 <p><span class="math display">\[
   \begin{align*}
-      p_{t} &amp; = \frac{-B_{12}}{B_{11}}q_t + \dots + u_{t}^D, &amp; B_{11}&gt;0,B_{12}&gt;0 \\
-      q_{t} &amp; = \frac{-B_{21}}{B_{22}}p_t + \dots + u_{t}^S, &amp; B_{22}&gt;0,B_{21}&lt;0
+      p_{t} &amp; = \frac{-B_{12}}{B_{11}}q_t + \dots + \frac{1}{B_{11}}u_{t}^D, &amp; B_{11}&gt;0,B_{12}&gt;0 \\
+      q_{t} &amp; = \frac{-B_{21}}{B_{22}}p_t + \dots + \frac{1}{B_{22}}u_{t}^S, &amp; B_{22}&gt;0,B_{21}&lt;0
   \end{align*}
 \]</span></p></li>
 <li><p>In the SVAR notation, <span class="math display">\[
@@ -562,7 +562,7 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <p><span class="math display">\[
   \begin{align*}
       B_{11}p_{t} &amp; = -B_{12}q_t + \dots + u_{t}^D \\
-      B_{22}q_{t} &amp; = -B_{22}p_t + \dots + u_{t}^S
+      B_{22}q_{t} &amp; = -B_{21}p_t + \dots + u_{t}^S
   \end{align*}
 \]</span></p></li>
 <li><p>In the SVAR notation, <span class="math display">\[
@@ -760,9 +760,9 @@ Xiaolei (Adam) Wang <a href="https://orcid.org/0009-0005-6192-9061" class="quart
 <li><p>This exercise extends the analysis on the US <code>optimism</code> dataset</p></li>
 <li><p>Goal: compare IRF plots by additionally imposing</p>
 <ul>
-<li>optimism shock is negative in 2007Q4, the start of the GFC</li>
+<li>optimism shock is negative in 2007Q3, the start of the GFC</li>
 </ul></li>
-<li><p>Hint: slide 23, row 211 of the dataset corresponds to 2007Q4, and</p></li>
+<li><p>Hint: slide 23, row 211 of the dataset corresponds to 2007Q3, and</p></li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>?specify_narrative</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
